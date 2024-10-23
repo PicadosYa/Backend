@@ -1,10 +1,14 @@
 package models
 
+import "picadosYa/internal/entity"
+
 type User struct {
-	ID            int64  `json:"id"`
-	Email         string `json:"email"`
-	Name          string `json:"name"`
-	Lastname      string `json:"lastname"`
-	Telephone     string `json:"telephone"`
-	Profile_photo string `json:"profile_photo"`
+	ID                int64           `json:"id"`
+	FirstName         string          `json:"first_name"`
+	LastName          string          `json:"last_name"`
+	Email             string          `json:"email"`
+	Phone             string          `json:"phone"`
+	ProfilePictureUrl string          `json:"profile_picture_url"`
+	Role              entity.UserRole `json:"role"`
+	PositionPlayer    string          `json:"position_player"`
 }

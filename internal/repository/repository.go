@@ -10,12 +10,8 @@ import (
 
 //go:generate mockery --name=Repository --output=repository --inpackage
 type Repository interface {
-	SaveUser(ctx context.Context, email, name, lastname, password, telephone, profile_photo string) error
+	SaveUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string) error
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
-
-	SaveUserRole(ctx context.Context, userID, roleID int64) error
-	RemoveUserRole(ctx context.Context, userID, roleID int64) error
-	GetUserRoles(ctx context.Context, userID int64) ([]entity.UserRole, error)
 }
 
 type repo struct {

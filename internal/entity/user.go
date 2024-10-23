@@ -1,11 +1,13 @@
 package entity
 
 type User struct {
-	ID            int64  `db:"id"`
-	Email         string `db:"email"`
-	Name          string `db:"name"`
-	Password      string `db:"password"`
-	Lastname      string `db:"lastname"`
-	Telephone     string `db:"telephone"`
-	Profile_photo string `db:"profile_photo"`
+	ID                int64    `db:"id"`
+	FirstName         string   `db:"first_name"`
+	LastName          string   `db:"last_name"`
+	Email             string   `db:"email"`
+	Password          string   `db:"password"`
+	Phone             string   `db:"phone"`
+	ProfilePictureUrl string   `db:"profile_picture_url"`
+	Role              UserRole `db:"role"`
+	PositionPlayer    string   `db:"position_player"`
 }

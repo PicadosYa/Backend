@@ -44,35 +44,17 @@ func (_m *MockRepository) GetUserByEmail(ctx context.Context, email string) (*en
 	return r0, r1
 }
 
-// RemoveUserRole provides a mock function with given fields: ctx, userID, roleID
-func (_m *MockRepository) RemoveUserRole(ctx context.Context, userID int64, roleID int64) error {
-	ret := _m.Called(ctx, userID, roleID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for RemoveUserRole")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) error); ok {
-		r0 = rf(ctx, userID, roleID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // SaveUser provides a mock function with given fields: ctx, email, name, lastname, password, telephone, profile_photo
-func (_m *MockRepository) SaveUser(ctx context.Context, email string, name string, lastname string, password string, telephone string, profile_photo string) error {
-	ret := _m.Called(ctx, email, name, lastname, password, telephone, profile_photo)
+func (_m *MockRepository) SaveUser(ctx context.Context, first_name string, last_name string, email string, password string, phone string, profile_picture_url string, role entity.UserRole, position_player string) error {
+	ret := _m.Called(ctx, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SaveUser")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, string, string) error); ok {
-		r0 = rf(ctx, email, name, lastname, password, telephone, profile_photo)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, string, string, entity.UserRole, string) error); ok {
+		r0 = rf(ctx, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -80,23 +62,6 @@ func (_m *MockRepository) SaveUser(ctx context.Context, email string, name strin
 	return r0
 }
 
-// SaveUserRole provides a mock function with given fields: ctx, userID, roleID
-func (_m *MockRepository) SaveUserRole(ctx context.Context, userID int64, roleID int64) error {
-	ret := _m.Called(ctx, userID, roleID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for SaveUserRole")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) error); ok {
-		r0 = rf(ctx, userID, roleID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
 
 // NewMockRepository creates a new instance of MockRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
