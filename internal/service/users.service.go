@@ -5,17 +5,16 @@ import (
 	"errors"
 
 	"picadosYa/encryption"
+	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
 )
 
 var (
 	ErrUserAlreadyExists  = errors.New("user already exists")
 	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrRoleAlreadyAdded   = errors.New("role was already added for this user")
-	ErrRoleNotFound       = errors.New("role not found")
 )
 
-func (s *serv) RegisterUser(ctx context.Context, email, name, lastname, password, telephone, profile_photo string) error {
+func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string) error {
 	u, _ := s.repo.GetUserByEmail(ctx, email)
 	if u != nil {
 		return ErrUserAlreadyExists
@@ -29,7 +28,7 @@ func (s *serv) RegisterUser(ctx context.Context, email, name, lastname, password
 
 	pass := encryption.ToBase64(bb)
 
-	return s.repo.SaveUser(ctx, email, name, lastname, pass, telephone, profile_photo)
+	return s.repo.SaveUser(ctx, first_name, last_name, email, pass, phone, profile_picture_url, role, position_player)
 }
 
 func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.User, error) {
@@ -37,12 +36,10 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 	if err != nil {
 		return nil, err
 	}
-
 	bb, err := encryption.FromBase64(u.Password)
 	if err != nil {
 		return nil, err
 	}
-
 	decryptedPassword, err := encryption.Decrypt(bb)
 	if err != nil {
 		return nil, err
@@ -52,43 +49,13 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 		return nil, ErrInvalidCredentials
 	}
 	return &models.User{
-		ID:    u.ID,
-		Email: u.Email,
-		Name:  u.Name,
+		ID:                u.ID,
+		FirstName:         u.FirstName,
+		LastName:          u.LastName,
+		Email:             u.Email,
+		Phone:             u.Phone,
+		ProfilePictureUrl: u.ProfilePictureUrl,
+		Role:              entity.UserRole(u.Role),
+		PositionPlayer:    u.PositionPlayer,
 	}, nil
-}
-
-func (s *serv) AddUserRole(ctx context.Context, userID, roleID int64) error {
-	roles, err := s.repo.GetUserRoles(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	for _, r := range roles {
-		if r.RoleID == roleID {
-			return ErrRoleAlreadyAdded
-		}
-	}
-	return s.repo.SaveUserRole(ctx, userID, roleID)
-}
-
-func (s *serv) RemoveUserRole(ctx context.Context, userID, roleID int64) error {
-	roles, err := s.repo.GetUserRoles(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	roleFound := false
-	for _, r := range roles {
-		if r.RoleID == roleID {
-			roleFound = true
-			break
-		}
-	}
-
-	if !roleFound {
-		return ErrRoleNotFound
-	}
-
-	return s.repo.RemoveUserRole(ctx, userID, roleID)
 }

@@ -1,10 +1,24 @@
 package dtos
 
+import "picadosYa/internal/entity"
+
 type RegisterUser struct {
-	Email         string `json:"email" validate:"required,email"`
-	Name          string `json:"name" validate:"required"`
-	Lastname      string `json:"lastname" validate:"required"`
-	Password      string `json:"password" validate:"required,min=8"`
-	Telephone     string `json:"telephone" validate:"required"`
-	Profile_photo string `json:"profile_photo" validate:"required"`
+	FirstName         string          `json:"first_name" validate:"required"`
+	Lastname          string          `json:"last_name" validate:"required"`
+	Email             string          `json:"email" validate:"required,email"`
+	Password          string          `json:"password" validate:"required,min=8"`
+	Phone             string          `json:"phone" validate:"required"`
+	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
+	Role              entity.UserRole `json:"role" validate:"required"`
+	PositionPlayer    string          `json:"position_player" validate:"required"`
+}
+
+type RegisteredUser struct {
+	FirstName         string          `json:"first_name" validate:"required"`
+	LastName          string          `json:"last_name" validate:"required"`
+	Email             string          `json:"email" validate:"required,email"`
+	Phone             string          `json:"phone" validate:"required"`
+	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
+	Role              entity.UserRole `json:"role" validate:"required"`
+	PositionPlayer    string          `json:"position_player" validate:"required"`
 }
