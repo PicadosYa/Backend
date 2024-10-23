@@ -8,24 +8,16 @@ import (
 
 const (
 	qryInsertUser = `
-	INSERT INTO USERS (email, name, lastname, password, telephone, profile_photo)
-	VALUES (?, ?, ?, ?, ?, ?);`
+	INSERT INTO USERS (first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
 
 	qryGetUserByEmail = `
-	select id, email, name, password, telephone, profile_photo from USERS where email = ?;`
-
-	qryInsertUserRole = `
-	insert into USER_ROLES (user_id, role_id) values (:user_id, :role_id);
-	`
-
-	qryRemoveUserRole = `
-	delete from USER_ROLES where user_id = :user_id and role_id = :role_id;
-	`
+	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player from USERS where email = ?;`
 )
 
-func (r *repo) SaveUser(ctx context.Context, email, name, lastname, password, telephone, profile_photo string) error {
+func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string) error {
 	// El cifrado de la contraseña va en service
-	_, err := r.db.ExecContext(ctx, qryInsertUser, email, name, lastname, password, telephone, profile_photo)
+	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
 	return err
 }
 
@@ -36,32 +28,4 @@ func (r *repo) GetUserByEmail(ctx context.Context, email string) (*entity.User, 
 		return nil, err
 	}
 	return u, nil
-}
-
-func (r *repo) SaveUserRole(ctx context.Context, userID, roleID int64) error {
-	data := entity.UserRole{
-		UserID: userID,
-		RoleID: roleID,
-	}
-
-	_, err := r.db.NamedExecContext(ctx, qryInsertUserRole, data)
-
-	return err
-}
-func (r *repo) RemoveUserRole(ctx context.Context, userID, roleID int64) error {
-	data := entity.UserRole{
-		UserID: userID,
-		RoleID: roleID,
-	}
-	_, err := r.db.NamedExecContext(ctx, qryRemoveUserRole, data)
-	return err
-}
-
-func (r *repo) GetUserRoles(ctx context.Context, userID int64) ([]entity.UserRole, error) {
-	roles := []entity.UserRole{}
-	err := r.db.SelectContext(ctx, &roles, "select user_id, role_id from USER_ROLES where user_id = ?", userID)
-	if err != nil {
-		return nil, err
-	}
-	return roles, nil
 }
