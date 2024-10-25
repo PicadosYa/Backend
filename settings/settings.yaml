@@ -1,6 +1,6 @@
 port: 8080
 database:
-  host: mysql
+  host: localhost
   port: 3306
   user: picadosya
   password: password
