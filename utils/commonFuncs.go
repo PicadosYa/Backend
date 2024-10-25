@@ -5,6 +5,8 @@ import (
 	"log"
 	"picadosYa/internal/models"
 	"strings"
+
+	//"text/template/parse"
 	"time"
 
 	"github.com/go-openapi/strfmt"
@@ -83,11 +85,11 @@ func ParseReservations(reservations string) []models.ReservationReduced {
 		fields := strings.Split(entry, ",")
 		var res models.ReservationReduced
 		for _, field := range fields {
-			keyValue := strings.Split(field, ":")
+			separatorIndex := strings.Index(field, ":")
 
-			key := strings.TrimSpace(keyValue[0])
+			key := strings.TrimSpace(field[:separatorIndex])
 
-			value := strings.TrimSpace(keyValue[1])
+			value := strings.TrimSpace(field[separatorIndex+1:])
 
 			switch key {
 			case "date":
@@ -95,10 +97,13 @@ func ParseReservations(reservations string) []models.ReservationReduced {
 				res.Date = strfmt.Date(parsedDate)
 			case "start_time":
 				log.Println(value)
-				res.StartTime, _ = time.Parse("15:04:00", fmt.Sprintf("%s:00:00", value))
+				parsedTime, _ := time.Parse("15:04:05", value)
+				res.StartTime = models.HourMinute(parsedTime)
 			case "end_time":
 				log.Println(value)
-				res.EndTime, _ = time.Parse("15:04:00", fmt.Sprintf("%s:00:00", value))
+				parsedTime, _ := time.Parse("15:04:05", value)
+				res.EndTime = models.HourMinute(parsedTime)
+
 			}
 		}
 		reservationList = append(reservationList, res)

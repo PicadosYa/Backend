@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-openapi/strfmt"
@@ -35,6 +36,15 @@ type UnvailableDates struct {
 
 type ReservationReduced struct {
 	Date      strfmt.Date
-	StartTime time.Time
-	EndTime   time.Time
+	StartTime HourMinute
+	EndTime   HourMinute
+}
+
+type HourMinute time.Time
+
+// Personalizar la salida JSON para el tipo HourMinute
+func (hm HourMinute) MarshalJSON() ([]byte, error) {
+	// Formatear la hora en "15:04" (hora:minutos)
+	formatted := fmt.Sprintf("\"%s\"", time.Time(hm).Format("15:04"))
+	return []byte(formatted), nil
 }
