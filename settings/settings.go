@@ -2,6 +2,7 @@ package settings
 
 import (
 	_ "embed"
+	"fmt"
 
 	"gopkg.in/yaml.v3"
 )
@@ -28,5 +29,8 @@ func New() (*Settings, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("Loaded settings: %+v\n", s)
+
 	return &s, nil
 }
