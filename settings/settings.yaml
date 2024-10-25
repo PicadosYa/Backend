@@ -4,4 +4,4 @@ database:
   port: 3306
   user: root
   password: pass123
-  name: app_picadosya
+  name: app_picadosYa
