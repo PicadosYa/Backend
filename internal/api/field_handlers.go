@@ -1,0 +1,131 @@
+package api
+
+import (
+	"log"
+	"net/http"
+	"picadosYa/internal/models"
+	"strconv"
+	"time"
+
+	"github.com/labstack/echo/v4"
+)
+
+func (a *API) GetFields(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	month := c.QueryParam("month")
+	var monthParsed time.Time
+	if month == "" {
+		monthParsed = time.Now()
+	} else {
+		var err error
+		monthParsed, err = time.Parse("2006-01", month)
+		if err != nil {
+			// Si ocurre un error en la conversión, se responde con un error 400
+			return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month format"})
+		}
+	}
+
+	limit := c.QueryParam("limit")
+	if limit == "" {
+		limit = "10"
+	}
+
+	offset := c.QueryParam("offset")
+	if offset == "" {
+		offset = "0"
+	}
+
+	limitParsed, err := strconv.Atoi(limit)
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid limit format, would be an integer (ej: 1)"})
+	}
+
+	offsetParsed, err := strconv.Atoi(offset)
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid offset format, would be an integer (ej: 10)"})
+	}
+
+	fields, err := a.fieldService.GetFields(ctx, monthParsed, limitParsed, offsetParsed)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
+	}
+	return c.JSON(http.StatusOK, fields)
+}
+
+func (a *API) GetField(c echo.Context) error {
+	ctx := c.Request().Context()
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+
+	}
+	month := c.QueryParam("month")
+	var monthParsed time.Time
+	if month == "" {
+		monthParsed = time.Now()
+	} else {
+		var err error
+		monthParsed, err = time.Parse("2006-01", month)
+		if err != nil {
+			// Si ocurre un error en la conversión, se responde con un error 400
+			return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month format"})
+		}
+	}
+
+	field, err := a.fieldService.GetField(ctx, id, monthParsed)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, field)
+}
+
+func (a *API) CreateField(c echo.Context) error {
+	ctx := c.Request().Context()
+	field := new(models.Field)
+	if err := c.Bind(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	log.Println("Bind data successful")
+	if err := a.dataValidator.Struct(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	log.Println("Validation successful")
+	if err := a.fieldService.SaveField(ctx, field); err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	log.Println("Save field successful")
+	return c.JSON(http.StatusCreated, field)
+}
+
+func (a *API) UpdateField(c echo.Context) error {
+	ctx := c.Request().Context()
+	field := new(models.Field)
+	if err := c.Bind(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.dataValidator.Struct(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.fieldService.UpdateField(ctx, field); err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, field)
+}
+
+func (a *API) RemoveField(c echo.Context) error {
+	ctx := c.Request().Context()
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+
+	}
+	if err := a.fieldService.RemoveField(ctx, id); err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}

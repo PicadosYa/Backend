@@ -10,12 +10,14 @@ import (
 
 type API struct {
 	serv          service.Service
+	fieldService  service.FieldService
 	dataValidator *validator.Validate
 }
 
-func New(serv service.Service) *API {
+func New(serv service.Service, fieldService service.FieldService) *API {
 	return &API{
 		serv:          serv,
+		fieldService:  fieldService,
 		dataValidator: validator.New(),
 	}
 }
