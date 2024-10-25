@@ -12,9 +12,45 @@ import (
 
 func (a *API) GetFields(c echo.Context) error {
 	ctx := c.Request().Context()
-	fields, err := a.fieldService.GetFields(ctx)
+
+	month := c.QueryParam("month")
+	var monthParsed time.Time
+	if month == "" {
+		monthParsed = time.Now()
+	} else {
+		var err error
+		monthParsed, err = time.Parse("2006-01", month)
+		if err != nil {
+			// Si ocurre un error en la conversión, se responde con un error 400
+			return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month format"})
+		}
+	}
+
+	limit := c.QueryParam("limit")
+	if limit == "" {
+		limit = "10"
+	}
+
+	offset := c.QueryParam("offset")
+	if offset == "" {
+		offset = "0"
+	}
+
+	limitParsed, err := strconv.Atoi(limit)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid limit format, would be an integer (ej: 1)"})
+	}
+
+	offsetParsed, err := strconv.Atoi(offset)
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid offset format, would be an integer (ej: 10)"})
+	}
+
+	fields, err := a.fieldService.GetFields(ctx, monthParsed, limitParsed, offsetParsed)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	return c.JSON(http.StatusOK, fields)
 }
@@ -27,13 +63,20 @@ func (a *API) GetField(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
 
 	}
-	month, err := time.Parse("2006-01", c.QueryParam("month"))
-	if err != nil {
-		// Si ocurre un error en la conversión, se responde con un error 400
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month format"})
+	month := c.QueryParam("month")
+	var monthParsed time.Time
+	if month == "" {
+		monthParsed = time.Now()
+	} else {
+		var err error
+		monthParsed, err = time.Parse("2006-01", month)
+		if err != nil {
+			// Si ocurre un error en la conversión, se responde con un error 400
+			return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month format"})
+		}
 	}
 
-	field, err := a.fieldService.GetField(ctx, id, month)
+	field, err := a.fieldService.GetField(ctx, id, monthParsed)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

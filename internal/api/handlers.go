@@ -14,6 +14,10 @@ import (
 type responseMessage struct {
 	Message string `json:"message"`
 }
+type responseError struct {
+	Message string `json:"message"`
+	Error   string `json:"error"`
+}
 
 func (a *API) RegisterUser(c echo.Context) error {
 	ctx := c.Request().Context()
