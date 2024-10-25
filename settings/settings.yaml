@@ -1,6 +1,6 @@
 port: 8080
 database:
-  host: localhost
+  host: 34.207.93.131
   port: 3306
   user: picadosya
   password: password
