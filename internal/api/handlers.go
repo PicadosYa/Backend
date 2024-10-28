@@ -99,6 +99,7 @@ func (a *API) LoginUser(c echo.Context) error {
 	}
 
 	c.SetCookie(cookie)
+	log.Println(cookie)
 	return c.JSON(http.StatusOK, userCreated)
 }
 
