@@ -12,7 +12,6 @@ import (
 
 func (a *API) GetFields(c echo.Context) error {
 	ctx := c.Request().Context()
-
 	month := c.QueryParam("month")
 	var monthParsed time.Time
 	if month == "" {

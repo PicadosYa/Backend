@@ -45,7 +45,7 @@ func (_m *MockRepository) GetUserByEmail(ctx context.Context, email string) (*en
 }
 
 // SaveUser provides a mock function with given fields: ctx, email, name, lastname, password, telephone, profile_photo
-func (_m *MockRepository) SaveUser(ctx context.Context, first_name string, last_name string, email string, password string, phone string, profile_picture_url string, role entity.UserRole, position_player string) error {
+func (_m *MockRepository) SaveUser(ctx context.Context, first_name string, last_name string, email string, password string, phone string, profile_picture_url string, role entity.UserRole, position_player string, age int) error {
 	ret := _m.Called(ctx, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
 
 	if len(ret) == 0 {
@@ -53,8 +53,8 @@ func (_m *MockRepository) SaveUser(ctx context.Context, first_name string, last_
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, string, string, entity.UserRole, string) error); ok {
-		r0 = rf(ctx, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, string, string, entity.UserRole, string, int) error); ok {
+		r0 = rf(ctx, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age)
 	} else {
 		r0 = ret.Error(0)
 	}
