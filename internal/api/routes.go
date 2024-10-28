@@ -5,9 +5,13 @@ import "github.com/labstack/echo/v4"
 func (a *API) RegisterRoutes(e *echo.Echo) {
 	apiGroup := e.Group("/api")
 
+	// ###################
+	// User Endpoints
+	// ###################
 	users := apiGroup.Group("/users")
 	users.POST("/register", a.RegisterUser)
 	users.POST("/login", a.LoginUser)
+	users.GET("/auth/token", a.GetExpiration)
 
 	// ###################
 	// Fields Endpoints

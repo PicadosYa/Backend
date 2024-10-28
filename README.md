@@ -1,5 +1,5 @@
 # Documentación de la API
- 
+
 ## `GET /fields`
 Este endpoint trae todas las canchas. EJ:
 
@@ -267,3 +267,48 @@ Sirve para insertar una nueva cancha: </br></br>
 ```
 
 `Response: 201`
+
+ 
+## `POST /users/register`
+Este endpoint crea el usuario 
+```JSON
+[
+  {
+    "first_name": "Javier",
+    "last_name": "Moreno",
+    "email": "javier.moreno@example.com",
+    "password": "javierPass321",
+    "phone": "654987321",
+    "profile_picture_url": "https://example.com/javier_pic.jpg",
+    "role": "client",
+    "position_player": "defensa",
+    "age": 22
+  }
+]
+```
+
+Retorna un Json con el usuario y un ```Response: 201```
+
+## `POST /users/login`
+Este endpoint te loguea con esta entrada
+```JSON
+{
+  "email": "javier.moreno@example.com",
+  "password": "javierPass321"
+}
+```
+
+Retorna un json con el usuario y un ```Response: 200``` 
+
+## `GET /users/auth/token`
+Este endpoint te devuelve un:
+```JSON
+{
+    "message": "Ok"
+} 
+```
+y ```Response: 200``` si tu token no ha expirado aún o un:
+{
+  Message: "El token ha expirado"
+}
+y ```Response: 401``` si el token ya expiró

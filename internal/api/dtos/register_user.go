@@ -11,6 +11,7 @@ type RegisterUser struct {
 	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
 	Role              entity.UserRole `json:"role" validate:"required"`
 	PositionPlayer    string          `json:"position_player" validate:"required"`
+	Age               int             `json:"age" validate:"required"`
 }
 
 type RegisteredUser struct {
@@ -21,4 +22,5 @@ type RegisteredUser struct {
 	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
 	Role              entity.UserRole `json:"role" validate:"required"`
 	PositionPlayer    string          `json:"position_player" validate:"required"`
+	Age               int             `json:"age" validate:"required"`
 }

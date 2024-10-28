@@ -15,12 +15,12 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: pass123
-      MYSQL_DATABASE: app_picadosYa
+      MYSQL_DATABASE: picadosya
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ../dump_app_picadosYa.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dump_app_picadosYa.sql:/docker-entrypoint-initdb.d/init.sql
 
 
 volumes:
