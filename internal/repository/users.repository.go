@@ -8,16 +8,16 @@ import (
 
 const (
 	qryInsertUser = `
-	INSERT INTO USERS (first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
+	INSERT INTO users (first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
 
 	qryGetUserByEmail = `
-	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player from USERS where email = ?;`
+	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age from users where email = ?;`
 )
 
-func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string) error {
+func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string, age int) error {
 	// El cifrado de la contraseña va en service
-	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, profile_picture_url, role, position_player)
+	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age)
 	return err
 }
 

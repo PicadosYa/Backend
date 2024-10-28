@@ -30,8 +30,7 @@ func New(ctx context.Context, s *settings.Settings) (*sqlx.DB, error) {
 		if err == nil {
 			return db, nil
 		}
-		fmt.Println("Error conectando a la base de datos, reintentando en 5 segundos...")
-		fmt.Println("Error:", err)
+		fmt.Println("Error conectando a la base de datos, reintentando en 5 segundos...", err)
 		time.Sleep(5 * time.Second)
 	}
 	return nil, fmt.Errorf("no se pudo conectar a la base de datos: %w", err)

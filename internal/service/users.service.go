@@ -14,7 +14,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
-func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string) error {
+func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string, edad int) error {
 	u, _ := s.repo.GetUserByEmail(ctx, email)
 	if u != nil {
 		return ErrUserAlreadyExists
@@ -28,7 +28,7 @@ func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, p
 
 	pass := encryption.ToBase64(bb)
 
-	return s.repo.SaveUser(ctx, first_name, last_name, email, pass, phone, profile_picture_url, role, position_player)
+	return s.repo.SaveUser(ctx, first_name, last_name, email, pass, phone, profile_picture_url, role, position_player, edad)
 }
 
 func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.User, error) {
@@ -57,5 +57,6 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 		ProfilePictureUrl: u.ProfilePictureUrl,
 		Role:              entity.UserRole(u.Role),
 		PositionPlayer:    u.PositionPlayer,
+		Age:               u.Age,
 	}, nil
 }
