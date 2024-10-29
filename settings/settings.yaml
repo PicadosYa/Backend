@@ -1,7 +1,6 @@
 port: 8080
 database:
-  host: mysql
+  host: 127.0.0.1 
   port: 3306
   user: picadosya
   password: password
-  name: picadosya

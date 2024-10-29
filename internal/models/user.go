@@ -11,4 +11,5 @@ type User struct {
 	ProfilePictureUrl string          `json:"profile_picture_url"`
 	Role              entity.UserRole `json:"role"`
 	PositionPlayer    string          `json:"position_player"`
+	Age               int             `json:"age"`
 }

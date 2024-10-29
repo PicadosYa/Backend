@@ -10,4 +10,5 @@ type User struct {
 	ProfilePictureUrl string   `db:"profile_picture_url"`
 	Role              UserRole `db:"role"`
 	PositionPlayer    string   `db:"position_player"`
+	Age               int      `db:"age"`
 }

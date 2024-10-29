@@ -14,14 +14,14 @@ services:
     image: mysql:8.0
     container_name: mysql_container
     environment:
-      MYSQL_ROOT_PASSWORD: pass123
-      MYSQL_DATABASE: app_picadosYa
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_DATABASE:?error}
     ports:
-      - "3306:3306"
+      - "${DB_PORT:?error}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ../dump_app_picadosYa.sql:/docker-entrypoint-initdb.d/init.sql
-
+    
 
 volumes:
   mysql_data:
