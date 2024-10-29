@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"picadosYa/database"
 	"picadosYa/internal/api"
 	"picadosYa/internal/repository"
@@ -15,6 +14,7 @@ import (
 )
 
 func main() {
+
 	app := fx.New(
 		fx.Provide(
 			context.Background,
@@ -22,8 +22,10 @@ func main() {
 			database.New,
 			repository.New,
 			repository.NewFieldRepository,
+			repository.NewReservationRepository,
 			service.New,
 			service.NewFieldService,
+			service.NewReservationService,
 			api.New,
 			echo.New,
 		),
