@@ -8,13 +8,13 @@ import (
 )
 
 func SignedLoginToken(u *models.User) (string, error) {
-	expirationTime := time.Now().Add(time.Minute * 5)
+	expirationTime := time.Now().Add(time.Hour * 5)
 	// Es viable este método si el servidor que creó el token
 	// es el que se encarga de validarlo
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":      u.Email,
 		"first_name": u.FirstName,
-		"expires":    expirationTime.Unix(),
+		"exp":        expirationTime.Unix(),
 		"role":       u.Role,
 	})
 

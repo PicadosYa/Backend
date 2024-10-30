@@ -104,6 +104,7 @@ func (a *API) LoginUser(c echo.Context) error {
 }
 
 func (a *API) GetExpiration(c echo.Context) error {
+	tokenStr := c.Request().Header.Get("Authorization")
 	cookie, err := c.Cookie("Authorization")
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -111,8 +112,10 @@ func (a *API) GetExpiration(c echo.Context) error {
 			return c.JSON(http.StatusUnauthorized, responseMessage{Message: "No hay cookie"})
 		}
 	}
+	if tokenStr == "" {
+		tokenStr = cookie.Value
+	}
 
-	tokenStr := cookie.Value
 	tkn, err := encryption.ParseLoginJWT(tokenStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, responseMessage{Message: "Error al decodificar la cookie"})
