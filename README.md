@@ -312,3 +312,91 @@ y ```Response: 200``` si tu token no ha expirado aún o un:
   Message: "El token ha expirado"
 }
 y ```Response: 401``` si el token ya expiró
+
+
+
+# Documentación de la API de Reservas
+
+## `GET /reservations`
+Trae todas las reservas. EJ:
+
+```JSON
+[
+  {
+    "id": 1,
+    "field_id": 1,
+    "date": "2024-10-15",
+    "start_time": "19:00",
+    "end_time": "23:00",
+    "user_id": 1,
+    "status": "pending"
+  },
+  {
+    "id": 2,
+    "field_id": 1,
+    "date": "2024-10-15",
+    "start_time": "19:00",
+    "end_time": "23:00",
+    "user_id": 1,
+    "status": "pending"
+  },
+  {
+    "id": 3,
+    "field_id": 1,
+    "date": "2024-10-15",
+    "start_time": "19:00",
+    "end_time": "23:00",
+    "user_id": 1,
+    "status": "pending"
+  }
+]
+```
+
+## `GET /reservations/:id`
+Trae una reserva en particular. EJ:
+
+```JSON
+{
+  "id": 1,
+  "field_id": 1,
+  "date": "2024-10-15",
+  "start_time": "19:00",
+  "end_time": "23:00",
+  "user_id": 1,
+  "status": "pending"
+}
+```
+
+## `POST /reservations`
+Sirve para insertar una nueva reserva: </br></br>
+<b>Ejemplo de Request Body: </b>
+
+```JSON
+{
+  "field_id": 1,
+  "date": "2024-10-15",
+  "start_time": "19:00",
+  "end_time": "23:00",
+  "user_id": 1,
+  "status": "pending"
+}
+```
+
+`Response: 201`
+
+## `PUT /reservations/:id`
+Sirve para actualizar una reserva: </br></br>
+<b>Ejemplo de Request Body: </b>
+
+```JSON
+{
+  "status": "approved"
+}
+```
+
+`Response: 200`
+
+## `DELETE /reservations/:id`
+Sirve para eliminar una reserva: </br></br>
+
+`Response: 204`
