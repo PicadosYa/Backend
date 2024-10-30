@@ -110,6 +110,21 @@ func (a *API) UpdateField(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	if err := a.fieldService.UpdateField(ctx, field); err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
+	}
+	return c.JSON(http.StatusOK, field)
+}
+
+func (a *API) PatchField(c echo.Context) error {
+	ctx := c.Request().Context()
+	field := new(models.Field)
+	if err := c.Bind(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.dataValidator.Struct(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.fieldService.PatchField(ctx, field); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	return c.JSON(http.StatusOK, field)

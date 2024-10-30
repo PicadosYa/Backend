@@ -23,6 +23,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	fields.GET("/:id", a.GetField)
 	fields.POST("", a.CreateField)
 	fields.PUT("/:id", a.UpdateField)
+	fields.PATCH("/:id", a.PatchField)
 	fields.DELETE("/:id", a.RemoveField)
 
 	// ###################

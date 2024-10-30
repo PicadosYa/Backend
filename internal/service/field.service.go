@@ -6,6 +6,8 @@ import (
 	"picadosYa/internal/models"
 	"picadosYa/internal/repository"
 	"time"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type FieldService interface {
@@ -13,6 +15,7 @@ type FieldService interface {
 	GetField(ctx context.Context, id int, month time.Time) (*models.Field, error)
 	GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error)
 	UpdateField(ctx context.Context, field *models.Field) error
+	PatchField(ctx context.Context, field *models.Field) error
 	RemoveField(ctx context.Context, id int) error
 }
 
@@ -40,7 +43,25 @@ func (s *fieldService) GetFields(ctx context.Context, month time.Time, limit int
 }
 
 func (s *fieldService) UpdateField(ctx context.Context, field *models.Field) error {
+	err := validation.ValidateStruct(field,
+		validation.Field(&field.Id, validation.Required),
+	)
+
+	if err != nil {
+		return err
+	}
 	return s.repo.UpdateField(ctx, field)
+}
+
+func (s *fieldService) PatchField(ctx context.Context, field *models.Field) error {
+	err := validation.ValidateStruct(field,
+		validation.Field(&field.Id, validation.Required),
+	)
+
+	if err != nil {
+		return err
+	}
+	return s.repo.PatchField(ctx, field)
 }
 
 func (s *fieldService) RemoveField(ctx context.Context, id int) error {
