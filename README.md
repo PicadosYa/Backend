@@ -271,6 +271,7 @@ Sirve para insertar una nueva cancha: </br></br>
  
 ## `POST /users/register`
 Este endpoint crea el usuario 
+telefono, edad, posicion, foto no es obligatorio
 ```JSON
 [
   {

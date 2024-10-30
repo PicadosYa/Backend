@@ -12,6 +12,8 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.POST("/register", a.RegisterUser)
 	users.POST("/login", a.LoginUser)
 	users.GET("/auth/token", a.GetExpiration)
+	users.POST("/password-recovery", a.RequestPasswordRecovery)
+	users.PUT("/reset-password", a.ResetPassword)
 
 	// ###################
 	// Fields Endpoints
