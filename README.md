@@ -268,6 +268,11 @@ Sirve para insertar una nueva cancha: </br></br>
 
 `Response: 201`
 
+## `UPDATE /api/fields/:id`
+Mismo Body que Save
+
+## `PATCH /api/fields/:id`
+El body traera SOLO los campos que se quieran actualizar
  
 ## `POST /users/register`
 Este endpoint crea el usuario 
