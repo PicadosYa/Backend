@@ -6,9 +6,9 @@ import (
 	"picadosYa/encryption"
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/service"
+	"picadosYa/utils"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -170,7 +170,7 @@ func (a *API) RequestPasswordRecovery(c echo.Context) error {
 	}
 
 	// Generate a recovery token
-	recoveryToken := uuid.New().String()
+	recoveryToken := utils.GenerateRandomDigits(6)
 
 	// Save the token with an expiration time (e.g., 15 minutes)
 	err := a.serv.SavePasswordRecoveryToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))

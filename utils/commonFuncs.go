@@ -3,7 +3,9 @@ package utils
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"picadosYa/internal/models"
+	"strconv"
 	"strings"
 
 	//"text/template/parse"
@@ -109,4 +111,26 @@ func ParseReservations(reservations string) []models.ReservationReduced {
 		reservationList = append(reservationList, res)
 	}
 	return reservationList
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func GenerateRandomString(n int) string {
+	sb := strings.Builder{}
+	sb.Grow(n)
+	for i := 0; i < n; i++ {
+		idx := rand.Int63() % int64(len(letterBytes))
+		sb.WriteByte(letterBytes[idx])
+	}
+	return sb.String()
+}
+
+func GenerateRandomDigits(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	var result string
+	for i := 0; i < n; i++ {
+		digit := rand.Intn(10) // genera un número aleatorio entre 0 y 9
+		result += strconv.Itoa(digit)
+	}
+	return result
 }

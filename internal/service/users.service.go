@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"picadosYa/encryption"
 	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
@@ -80,16 +81,16 @@ func (s *serv) SavePasswordRecoveryToken(ctx context.Context, email, token strin
 }
 
 func (s *serv) SendRecoveryEmail(email, token string) error {
-	APIKEY := "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"
-	baseURL := "http://localhost:8080"
+	APIKEY := os.Getenv("SENDGRID_API_KEY")
+	baseURL := os.Getenv("APP_BASE_URL")
 
 	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
 	subject := "Password Recovery"
-	to := mail.NewEmail("User", "simonpintos7@gmail.com")
-	recoveryURL := fmt.Sprintf("%s/reset-password?token=%s", baseURL, token)
+	to := mail.NewEmail("User", email)
+	recoveryURL := fmt.Sprintf("%s/api/users/reset-password", baseURL)
 	plainTextContent := fmt.Sprintf("Use the following link to reset your password: %s", recoveryURL)
 
-	htmlContent := fmt.Sprintf("<p>Click <a href='%s'>here</a> to reset your password.</p>", recoveryURL)
+	htmlContent := fmt.Sprintf("<p>Click <a href='%s'>here</a> to reset your password. Your code is: %s</p>", recoveryURL, token)
 
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 

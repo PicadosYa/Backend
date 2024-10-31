@@ -12,7 +12,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.POST("/register", a.RegisterUser)
 	users.POST("/login", a.LoginUser)
 	users.GET("/auth/token", a.GetExpiration)
-	users.POST("/password-recovery", a.RequestPasswordRecovery)
+	users.POST("/password-recovery", a.RequestPasswordRecovery) // envía la movida al mail
 	users.PUT("/reset-password", a.ResetPassword)
 
 	// ###################
