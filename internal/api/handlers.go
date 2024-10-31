@@ -169,16 +169,15 @@ func (a *API) RequestPasswordRecovery(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
 
-	// Generate a recovery token
+	// Genera el token de 6 digitos
 	recoveryToken := utils.GenerateRandomDigits(6)
 
-	// Save the token with an expiration time (e.g., 15 minutes)
 	err := a.serv.SavePasswordRecoveryToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Unable to save recovery token"})
 	}
 
-	// Send the recovery email
+	// Envía el mail
 	err = a.serv.SendRecoveryEmail(params.Email, recoveryToken)
 	if err != nil {
 

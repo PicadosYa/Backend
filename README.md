@@ -276,7 +276,8 @@ El body traera SOLO los campos que se quieran actualizar
  
 ## `POST /users/register`
 Este endpoint crea el usuario 
-telefono, edad, posicion, foto no es obligatorio
+phone, age, profile_picture_url no es obligatorio, pero en "role" siempre hay que poner uno de los 3 valores: admin, client, field
+para la password tiene minímo 8 caracteres
 ```JSON
 [
   {
@@ -285,10 +286,7 @@ telefono, edad, posicion, foto no es obligatorio
     "email": "javier.moreno@example.com",
     "password": "javierPass321",
     "phone": "654987321",
-    "profile_picture_url": "https://example.com/javier_pic.jpg",
     "role": "client",
-    "position_player": "defensa",
-    "age": 22
   }
 ]
 ```
