@@ -97,12 +97,21 @@ func (a *API) CreateField(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	log.Println("Save field successful")
-	return c.JSON(http.StatusCreated, field)
+	return c.NoContent(http.StatusCreated)
 }
 
 func (a *API) UpdateField(c echo.Context) error {
 	ctx := c.Request().Context()
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+
+	}
 	field := new(models.Field)
+	field.Id = id
+
 	if err := c.Bind(field); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -110,9 +119,34 @@ func (a *API) UpdateField(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	if err := a.fieldService.UpdateField(ctx, field); err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (a *API) PatchField(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		// Si ocurre un error en la conversión, se responde con un error 400
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+
+	}
+	field := new(models.Field)
+
+	field.Id = id
+
+	if err := c.Bind(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.dataValidator.Struct(field); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	if err := a.fieldService.PatchField(ctx, field); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, field)
+	return c.NoContent(http.StatusOK)
 }
 
 func (a *API) RemoveField(c echo.Context) error {
@@ -126,5 +160,5 @@ func (a *API) RemoveField(c echo.Context) error {
 	if err := a.fieldService.RemoveField(ctx, id); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	return c.NoContent(http.StatusNoContent)
+	return c.NoContent(http.StatusOK)
 }

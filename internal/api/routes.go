@@ -1,6 +1,8 @@
 package api
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+)
 
 func (a *API) RegisterRoutes(e *echo.Echo) {
 	apiGroup := e.Group("/api")
@@ -23,5 +25,16 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	fields.GET("/:id", a.GetField)
 	fields.POST("", a.CreateField)
 	fields.PUT("/:id", a.UpdateField)
+	fields.PATCH("/:id", a.PatchField)
 	fields.DELETE("/:id", a.RemoveField)
+
+	// ###################
+	// Reservations Endpoints
+	// ###################
+	reservations := apiGroup.Group("/reservations")
+	reservations.GET("", a.GetReservations)
+	reservations.GET("/:id", a.GetReservation)
+	reservations.POST("", a.CreateReservation)
+	reservations.PUT("/:id", a.UpdateReservation)
+	reservations.DELETE("/:id", a.DeleteReservation)
 }

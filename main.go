@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-
 	"picadosYa/database"
 	"picadosYa/internal/api"
 	"picadosYa/internal/repository"
@@ -30,8 +29,10 @@ func main() {
 			database.New,
 			repository.New,
 			repository.NewFieldRepository,
+			repository.NewReservationRepository,
 			service.New,
 			service.NewFieldService,
+			service.NewReservationService,
 			api.New,
 			echo.New,
 		),
