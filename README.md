@@ -276,6 +276,7 @@ El body traera SOLO los campos que se quieran actualizar
  
 ## `POST /users/register`
 Este endpoint crea el usuario 
+telefono, edad, posicion, foto no es obligatorio
 ```JSON
 [
   {

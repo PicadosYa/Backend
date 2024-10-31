@@ -8,10 +8,10 @@ type RegisterUser struct {
 	Email             string          `json:"email" validate:"required,email"`
 	Password          string          `json:"password" validate:"required,min=8"`
 	Phone             string          `json:"phone" validate:"required"`
-	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
-	Role              entity.UserRole `json:"role" validate:"required"`
-	PositionPlayer    string          `json:"position_player" validate:"required"`
-	Age               int             `json:"age" validate:"required"`
+	ProfilePictureUrl string          `json:"profile_picture_url"`
+	Role              entity.UserRole `json:"role"`
+	PositionPlayer    string          `json:"position_player"`
+	Age               int             `json:"age"`
 }
 
 type RegisteredUser struct {
@@ -19,8 +19,8 @@ type RegisteredUser struct {
 	LastName          string          `json:"last_name" validate:"required"`
 	Email             string          `json:"email" validate:"required,email"`
 	Phone             string          `json:"phone" validate:"required"`
-	ProfilePictureUrl string          `json:"profile_picture_url" validate:"required"`
-	Role              entity.UserRole `json:"role" validate:"required"`
-	PositionPlayer    string          `json:"position_player" validate:"required"`
-	Age               int             `json:"age" validate:"required"`
+	ProfilePictureUrl string          `json:"profile_picture_url"`
+	Role              entity.UserRole `json:"role"`
+	PositionPlayer    string          `json:"position_player"`
+	Age               int             `json:"age"`
 }
