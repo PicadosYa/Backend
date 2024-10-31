@@ -1,24 +1,25 @@
 package api
 
 import (
-	"picadosYa/internal/service"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"picadosYa/internal/service"
 )
 
 type API struct {
-	serv          service.Service
-	fieldService  service.FieldService
-	dataValidator *validator.Validate
+	serv               service.Service
+	fieldService       service.FieldService
+	reservationService service.ReservationService
+	dataValidator      *validator.Validate
 }
 
-func New(serv service.Service, fieldService service.FieldService) *API {
+func New(serv service.Service, fieldService service.FieldService, reservationService service.ReservationService) *API {
 	return &API{
-		serv:          serv,
-		fieldService:  fieldService,
-		dataValidator: validator.New(),
+		serv:               serv,
+		fieldService:       fieldService,
+		reservationService: reservationService,
+		dataValidator:      validator.New(),
 	}
 }
 
