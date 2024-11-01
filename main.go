@@ -3,22 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"picadosYa/database"
 	"picadosYa/internal/api"
 	"picadosYa/internal/repository"
 	"picadosYa/internal/service"
 	"picadosYa/settings"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
-	//"github.com/joho/godotenv"
 )
 
 func main() {
 
-	//if err := godotenv.Load("../.env"); err != nil {
-	//	panic(err)
-	//}
+	if err := godotenv.Load("../.env"); err != nil {
+		panic(err)
+	}
 
 	app := fx.New(
 		fx.Provide(
@@ -46,8 +47,7 @@ func main() {
 func setLifeCycle(lc fx.Lifecycle, a *api.API, s *settings.Settings, e *echo.Echo) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			address := fmt.Sprintf(":%d", s.Port)
-			//address := fmt.Sprintf(":%s", os.Getenv("BACKEND_PORT"))
+			address := fmt.Sprintf(":%s", os.Getenv("BACKEND_PORT"))
 			go a.Start(e, address)
 			return nil
 		},
