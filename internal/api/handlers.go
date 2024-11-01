@@ -6,6 +6,7 @@ import (
 	"picadosYa/encryption"
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/service"
+	"picadosYa/utils"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -103,6 +104,31 @@ func (a *API) LoginUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, userCreated)
 }
 
+func (a *API) ResetPassword(c echo.Context) error {
+	ctx := c.Request().Context()
+	params := dtos.ResetPassword{}
+
+	err := c.Bind(&params)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
+	}
+
+	if err := a.dataValidator.Struct(params); err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
+	}
+
+	err = a.serv.ResetPassword(ctx, params.Email, params.Token, params.NewPassword)
+	if err != nil {
+		if err == service.ErrUserAlreadyExists {
+			return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
+		}
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
+	}
+
+	return c.JSON(http.StatusOK, responseMessage{Message: "Password successfully updated"})
+}
+
 func (a *API) GetExpiration(c echo.Context) error {
 	tokenStr := c.Request().Header.Get("Authorization")
 	cookie, err := c.Cookie("Authorization")
@@ -129,4 +155,34 @@ func (a *API) GetExpiration(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responseMessage{Message: "Ok"})
+}
+
+func (a *API) RequestPasswordRecovery(c echo.Context) error {
+	ctx := c.Request().Context()
+	params := dtos.RequestPasswordRecovery{}
+
+	if err := c.Bind(&params); err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
+	}
+
+	if err := a.dataValidator.Struct(params); err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
+	}
+
+	// Genera el token de 6 digitos
+	recoveryToken := utils.GenerateRandomDigits(6)
+
+	err := a.serv.SavePasswordRecoveryToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Unable to save recovery token"})
+	}
+
+	// Envía el mail
+	err = a.serv.SendRecoveryEmail(params.Email, recoveryToken)
+	if err != nil {
+
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, responseMessage{Message: "Recovery email sent"})
 }
