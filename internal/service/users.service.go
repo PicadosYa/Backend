@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"picadosYa/encryption"
 	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
@@ -81,21 +80,19 @@ func (s *serv) SavePasswordRecoveryToken(ctx context.Context, email, token strin
 }
 
 func (s *serv) SendRecoveryEmail(email, token string) error {
-	APIKEY := os.Getenv("SENDGRID_API_KEY")
-	baseURL := os.Getenv("APP_BASE_URL")
-
+	APIKEY := "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"
+	templateID := "d-14d7497e32d745889c502d5bb3d7bdca"
+	message := mail.NewV3Mail()
 	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
-	subject := "Password Recovery"
-	to := mail.NewEmail("User", email)
-	recoveryURL := fmt.Sprintf("%s/api/users/reset-password", baseURL)
-	plainTextContent := fmt.Sprintf("Use the following link to reset your password: %s", recoveryURL)
-
-	htmlContent := fmt.Sprintf("<p>Click <a href='%s'>here</a> to reset your password. Your code is: %s</p>", recoveryURL, token)
-
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
-
+	message.SetFrom(from)
+	personalization := mail.NewPersonalization()
+	to := mail.NewEmail("picadosya", email)
+	personalization.AddTos(to)
+	personalization.SetDynamicTemplateData("name", email)
+	personalization.SetDynamicTemplateData("token", token)
+	message.AddPersonalizations(personalization)
+	message.SetTemplateID(templateID)
 	client := sendgrid.NewSendClient(APIKEY)
-
 	response, err := client.Send(message)
 	if err != nil {
 		return err

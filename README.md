@@ -317,7 +317,37 @@ y ```Response: 200``` si tu token no ha expirado aún o un:
 }
 y ```Response: 401``` si el token ya expiró
 
+## Explicación de la lógica detrás de 'forgot password'
+Primero, hay que hacerle un POST a la siguiente ruta con solamente el email del usuario, lo cual activará la función de enviarle 
+al usuario el mail que contiene el token y la url para reestablecer su contraseña. El usuario presionará en el botón que le redirigirá a
+la ruta con método PUT (las instrucciones para esta ruta están colocadas después del método POST) y ahí pondrá su email, token y su nueva contraseña.
+## `POST /users/password-recovery` 
+```JSON
+{
+    "email": "usuario@example.com"
+} 
+``` 
+Al hacer este post te devolverá un ```Response: 200``` acompañado de un 
+```JSON
+{
+    "message": "Recovery email sent"
+}
+```
 
+## `PUT /users/reset-password` 
+```JSON
+{
+  "email": "usuario@example.com",
+  "token": "064126",
+  "new_password": "elejemplo12345"
+}
+``` 
+Al hacer este put te devolverá un ```Response: 200``` acompañado de un 
+```JSON
+{
+    "message": "Password successfully updated"
+}
+```
 
 # Documentación de la API de Reservas
 
@@ -404,3 +434,5 @@ Sirve para actualizar una reserva: </br></br>
 Sirve para eliminar una reserva: </br></br>
 
 `Response: 204`
+
+
