@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
-	"log"
 )
 
 const key = "77436389533582340839681488237694"
@@ -36,18 +35,13 @@ func Decrypt(ciphertext []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println(c, "acá esta el c1")
 
 	gcm, err := cipher.NewGCM(c)
 	if err != nil {
 		return nil, err
 	}
-	log.Println(gcm, "acá esta el c2")
 	nonceSize := gcm.NonceSize()
-	log.Println(ciphertext, ":ciphertext")
-	log.Println("nonceSize", nonceSize)
 	if len(ciphertext) < nonceSize {
-		log.Println("está entrando justito acá")
 		return nil, errors.New("ciphertext too short")
 	}
 

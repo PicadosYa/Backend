@@ -10,10 +10,9 @@ import (
 	"picadosYa/internal/service"
 	"picadosYa/settings"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
