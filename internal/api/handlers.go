@@ -7,6 +7,7 @@ import (
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/service"
 	"picadosYa/utils"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -131,21 +132,28 @@ func (a *API) ResetPassword(c echo.Context) error {
 func (a *API) GetExpiration(c echo.Context) error {
 	tokenStr := c.Request().Header.Get("Authorization")
 	cookie, err := c.Cookie("Authorization")
-	if err != nil {
-		if err == http.ErrNoCookie {
-
-			return c.JSON(http.StatusUnauthorized, responseMessage{Message: "No hay cookie"})
-		}
+	if err != nil && err == http.ErrNoCookie {
+		return c.JSON(http.StatusUnauthorized, responseMessage{Message: "No hay cookie"})
 	}
+
 	if tokenStr == "" {
 		tokenStr = cookie.Value
+	} else {
+		tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 	}
-
 	tkn, err := encryption.ParseLoginJWT(tokenStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responseMessage{Message: "Error al decodificar la cookie"})
+		log.Println(tokenStr)
+		log.Println(tkn)
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
-	expirationUnix := int64(tkn["expires"].(float64))
+
+	expiresVal, ok := tkn["exp"].(float64)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Formato de token inválido"})
+	}
+
+	expirationUnix := int64(expiresVal)
 	expirationTime := time.Unix(expirationUnix, 0)
 
 	timeRemaining := time.Until(expirationTime)
