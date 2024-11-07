@@ -100,7 +100,6 @@ func (a *API) LoginUser(c echo.Context) error {
 	}
 
 	c.SetCookie(cookie)
-	log.Println(cookie)
 	return c.JSON(http.StatusOK, userCreated)
 }
 
@@ -157,9 +156,9 @@ func (a *API) GetExpiration(c echo.Context) error {
 	return c.JSON(http.StatusOK, responseMessage{Message: "Ok"})
 }
 
-func (a *API) RequestPasswordRecovery(c echo.Context) error {
+func (a *API) VerifyUserEmail(c echo.Context) error {
 	ctx := c.Request().Context()
-	params := dtos.RequestPasswordRecovery{}
+	params := dtos.RequestSendEmail{}
 
 	if err := c.Bind(&params); err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
@@ -172,7 +171,56 @@ func (a *API) RequestPasswordRecovery(c echo.Context) error {
 	// Genera el token de 6 digitos
 	recoveryToken := utils.GenerateRandomDigits(6)
 
-	err := a.serv.SavePasswordRecoveryToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))
+	err := a.serv.SaveToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Unable to save recovery token"})
+	}
+
+	// Envía el mail
+	err = a.serv.SendVerifyEmail(params.Email, recoveryToken)
+	if err != nil {
+
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, responseMessage{Message: "Recovery email sent"})
+}
+
+func (a *API) UpdateVerifyUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	token := c.QueryParam("token")
+
+	// Verificar el token en la base de datos
+	user, err := a.serv.GetUserByToken(ctx, token)
+	if err != nil || user == nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
+	}
+
+	// Actualizar isVerified a true
+	err = a.serv.UpdateUserVerification(ctx, user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, responseMessage{Message: "User updated successfully"})
+}
+
+func (a *API) RequestPasswordRecovery(c echo.Context) error {
+	ctx := c.Request().Context()
+	params := dtos.RequestSendEmail{}
+
+	if err := c.Bind(&params); err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
+	}
+
+	if err := a.dataValidator.Struct(params); err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
+	}
+
+	// Genera el token de 6 digitos
+	recoveryToken := utils.GenerateRandomDigits(6)
+
+	err := a.serv.SaveToken(ctx, params.Email, recoveryToken, time.Now().Add(15*time.Minute))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Unable to save recovery token"})
 	}

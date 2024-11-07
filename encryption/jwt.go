@@ -16,6 +16,7 @@ func SignedLoginToken(u *models.User) (string, error) {
 		"first_name": u.FirstName,
 		"exp":        expirationTime.Unix(),
 		"role":       u.Role,
+		"isVerified": u.IsVerified,
 	})
 
 	// firma el jwt
