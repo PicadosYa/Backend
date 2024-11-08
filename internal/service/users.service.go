@@ -67,6 +67,7 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 		Role:              entity.UserRole(u.Role),
 		PositionPlayer:    u.PositionPlayer,
 		Age:               u.Age,
+		IsVerified:        u.IsVerified,
 	}, nil
 }
 

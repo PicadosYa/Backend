@@ -24,3 +24,15 @@ type RegisteredUser struct {
 	PositionPlayer    string          `json:"position_player"`
 	Age               int             `json:"age"`
 }
+
+type LoguedUser struct {
+	FirstName         string          `json:"first_name" validate:"required"`
+	LastName          string          `json:"last_name" validate:"required"`
+	Email             string          `json:"email" validate:"required,email"`
+	Phone             string          `json:"phone" validate:"required"`
+	ProfilePictureUrl string          `json:"profile_picture_url"`
+	Role              entity.UserRole `json:"role" validate:"required"`
+	PositionPlayer    string          `json:"position_player"`
+	Age               int             `json:"age"`
+	IsVerified        bool            `json:"isVerified"`
+}

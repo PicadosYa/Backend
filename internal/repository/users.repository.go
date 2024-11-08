@@ -13,7 +13,7 @@ const (
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
 
 	qryGetUserByEmail = `
-	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age from users where email = ?;`
+	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, isVerified from users where email = ?;`
 
 	qryInsertToken = `
     INSERT INTO tokens_in_emails (email, token, expires_at)

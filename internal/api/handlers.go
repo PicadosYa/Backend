@@ -75,7 +75,7 @@ func (a *API) LoginUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Internal server error"})
 	}
-	userCreated := dtos.RegisteredUser{
+	userCreated := dtos.LoguedUser{
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		Email:             u.Email,
@@ -84,6 +84,7 @@ func (a *API) LoginUser(c echo.Context) error {
 		Role:              u.Role,
 		PositionPlayer:    u.PositionPlayer,
 		Age:               u.Age,
+		IsVerified:        u.IsVerified,
 	}
 	token, err := encryption.SignedLoginToken(u)
 	log.Println(token)
