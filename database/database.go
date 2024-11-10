@@ -23,7 +23,7 @@ func New(ctx context.Context) (*sqlx.DB, error) {
 
 	var db *sqlx.DB
 	var err error
-	for i := 0; i < 3; i++ { // Intenta 3 veces
+	for i := 0; i < 10; i++ { // Intenta 10 veces
 		db, err = sqlx.ConnectContext(ctx, "mysql", connectionString)
 		if err == nil {
 			return db, nil

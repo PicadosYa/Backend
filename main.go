@@ -27,7 +27,11 @@ import (
 // @schema http
 func main() {
 
+<<<<<<< HEAD
 	if err := godotenv.Load("../.env"); err != nil {
+=======
+	if err := godotenv.Load("./.env"); err != nil {
+>>>>>>> 5b323e7bcc01bf3a183d68fefb6450ace3655de3
 		panic(err)
 	}
 
