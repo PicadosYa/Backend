@@ -349,6 +349,25 @@ Al hacer este put te devolverá un ```Response: 200``` acompañado de un
 }
 ```
 
+# Explicación de la lógica detrás de verify user account
+Primero hay que enviar el correo, esto se hace haciéndole un post a la siguiente URL con el email del usuario.
+
+## `POST /users/verify-user-email` 
+```JSON
+{
+    "email":"example@gmail.com"
+}
+```
+El cual va a retornar un JSON con un código de 200 OK
+```JSON
+{
+    "message": "Recovery email sent"
+}
+```
+Después de que llegue el mail, apretas en el botón de "Verificar cuenta" y te va a llevar a la url http://localhost:8080/api/users/verify?token=034527
+
+Al darle al botón en el mail te va a hacer un GET a la ruta: localhost:8080/api/users/verify?token=034527 Y automáticamente el usuario va a ser verificado y ya va a estar todo listo.
+
 # Documentación de la API de Reservas
 
 ## `GET /reservations`
