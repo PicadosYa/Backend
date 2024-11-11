@@ -93,16 +93,10 @@ func (a *API) LoginUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Internal server error"})
 	}
 
-	cookie := &http.Cookie{
-		Name:     "Authorization",
-		Value:    token,
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
-		Path:     "/",
-	}
-
-	c.SetCookie(cookie)
-	return c.JSON(http.StatusOK, userCreated)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"user":  userCreated,
+		"token": token,
+	})
 }
 
 func (a *API) ResetPassword(c echo.Context) error {
