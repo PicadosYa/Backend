@@ -31,6 +31,12 @@ const (
 	WHERE email = ?;
 	`
 
+	qryUpdateUserProfile = `
+	UPDATE users
+	SET SET first_name = ?, last_name = ?, email = ?, phone = ?, position_player = ?, team_name = ?, age = ?, profile_picture_url = ?
+	WHERE id = ?
+	`
+
 	qryVerifyRecoveryToken = `SELECT COUNT(1) FROM password_recovery_tokens WHERE email = ? AND token = ? AND expires_at > ?`
 
 	qryUpdateUserPassword = `UPDATE users SET password = ? WHERE email = ?`
@@ -71,6 +77,11 @@ func (r *repo) GetUserByToken(ctx context.Context, token string) (*dtos.VerifyUs
 
 func (r *repo) UpdateUserVerification(ctx context.Context, email string) error {
 	_, err := r.db.ExecContext(ctx, qryUpdateUserStatus, email)
+	return err
+}
+
+func (r *repo) UpdateUserProfileInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error {
+	_, err := r.db.ExecContext(ctx, qryUpdateUserProfile, first_name, last_name, email, phone, position_player, team_name, age, profile_picture_url, id)
 	return err
 }
 

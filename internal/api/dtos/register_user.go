@@ -28,3 +28,15 @@ type LoguedUser struct {
 	Role       entity.UserRole `json:"role" validate:"required"`
 	IsVerified bool            `json:"isVerified"`
 }
+
+type UpdateUser struct {
+	FirstName         string `json:"first_name"`
+	LastName          string `json:"last_name"`
+	Email             string `json:"email"`
+	Phone             string `json:"phone"`
+	PositionPlayer    string `json:"position_player"`
+	TeamName          string `json:"team_name"`
+	Age               int    `json:"age"`
+	ProfilePictureUrl string `json:"profile_picture_url"`
+	ID                int    `json:"id"`
+}

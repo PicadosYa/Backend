@@ -231,3 +231,29 @@ func (a *API) RequestPasswordRecovery(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responseMessage{Message: "Recovery email sent"})
 }
+
+func (a *API) UpdateUserProfileInfo(c echo.Context) error {
+	ctx := c.Request().Context()
+	params := dtos.UpdateUser{}
+	err := c.Bind(&params)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
+	}
+
+	// valida lo que tenemos asignado en el dto
+	err = a.dataValidator.Struct(params)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
+	}
+
+	err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email, params.Phone, params.PositionPlayer, params.TeamName, params.Age, params.ProfilePictureUrl, params.ID)
+	if err != nil {
+		if err == service.ErrUserAlreadyExists {
+			return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
+		}
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
+	}
+
+	return c.JSON(http.StatusOK, responseMessage{Message: "User updated successfully"})
+}

@@ -19,6 +19,7 @@ type Repository interface {
 	UpdateUserVerification(ctx context.Context, email string) error
 	VerifyRecoveryToken(ctx context.Context, email, token string) (bool, error)
 	UpdateUserPassword(ctx context.Context, email string, hashedPassword string) error
+	UpdateUserProfileInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error
 	DeleteRecoveryToken(ctx context.Context, email string) error
 }
 
