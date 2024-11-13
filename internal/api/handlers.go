@@ -62,7 +62,7 @@ func (a *API) LoginUser(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
 	}
-
+	log.Println(err)
 	err = a.dataValidator.Struct(params)
 	if err != nil {
 		log.Println(err)
@@ -70,24 +70,21 @@ func (a *API) LoginUser(c echo.Context) error {
 	}
 	u, err := a.serv.LoginUser(ctx, params.Email, params.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Internal server error"})
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
 	}
 	userCreated := dtos.LoguedUser{
-		FirstName:         u.FirstName,
-		LastName:          u.LastName,
-		Email:             u.Email,
-		Phone:             u.Phone,
-		ProfilePictureUrl: u.ProfilePictureUrl,
-		Role:              u.Role,
-		PositionPlayer:    u.PositionPlayer,
-		Age:               u.Age,
-		IsVerified:        u.IsVerified,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		Email:      u.Email,
+		Phone:      u.Phone,
+		Role:       u.Role,
+		IsVerified: u.IsVerified,
 	}
 	token, err := encryption.SignedLoginToken(u)
 	log.Println(token)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Internal server error"})
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{

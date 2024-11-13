@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/entity"
 	"time"
@@ -9,8 +10,8 @@ import (
 
 const (
 	qryInsertUser = `
-	INSERT INTO users (first_name, last_name, email, password, phone, role, accepted_terms)
-	VALUES (?, ?, ?, ?, ?, ?, ?);`
+	INSERT INTO users (first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, accepted_terms)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 
 	qryGetUserByEmail = `
 	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, isVerified from users where email = ?;`
@@ -39,7 +40,9 @@ const (
 
 func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
 	// El cifrado de la contraseña va en service
-	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, role, accepted_terms)
+
+	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, "default", role, "default", 0, accepted_terms)
+	log.Println(err)
 	return err
 }
 

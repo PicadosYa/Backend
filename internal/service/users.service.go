@@ -58,16 +58,13 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 		return nil, ErrInvalidCredentials
 	}
 	return &models.User{
-		ID:                u.ID,
-		FirstName:         u.FirstName,
-		LastName:          u.LastName,
-		Email:             u.Email,
-		Phone:             u.Phone,
-		ProfilePictureUrl: u.ProfilePictureUrl,
-		Role:              entity.UserRole(u.Role),
-		PositionPlayer:    u.PositionPlayer,
-		Age:               u.Age,
-		IsVerified:        u.IsVerified,
+		ID:         u.ID,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		Email:      u.Email,
+		Phone:      u.Phone,
+		Role:       entity.UserRole(u.Role),
+		IsVerified: u.IsVerified,
 	}, nil
 }
 
