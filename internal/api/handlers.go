@@ -35,7 +35,7 @@ func (a *API) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
 
-	err = a.serv.RegisterUser(ctx, params.FirstName, params.Lastname, params.Email, params.Password, params.Phone, params.ProfilePictureUrl, params.Role, params.PositionPlayer, params.Age)
+	err = a.serv.RegisterUser(ctx, params.FirstName, params.Lastname, params.Email, params.Password, params.Phone, params.Role, params.AcceptedTerms)
 	if err != nil {
 		if err == service.ErrUserAlreadyExists {
 			return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
@@ -44,14 +44,11 @@ func (a *API) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
 	}
 	userCreated := dtos.RegisteredUser{
-		FirstName:         params.FirstName,
-		LastName:          params.Lastname,
-		Email:             params.Email,
-		Phone:             params.Phone,
-		ProfilePictureUrl: params.ProfilePictureUrl,
-		Role:              params.Role,
-		PositionPlayer:    params.PositionPlayer,
-		Age:               params.Age,
+		FirstName: params.FirstName,
+		LastName:  params.Lastname,
+		Email:     params.Email,
+		Phone:     params.Phone,
+		Role:      params.Role,
 	}
 	return c.JSON(http.StatusCreated, userCreated)
 }

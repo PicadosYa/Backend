@@ -23,7 +23,7 @@ var (
 
 const APIKEY = "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"
 
-func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string, edad int) error {
+func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
 	u, _ := s.repo.GetUserByEmail(ctx, email)
 	if u != nil {
 		return ErrUserAlreadyExists
@@ -37,7 +37,7 @@ func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, p
 
 	pass := encryption.ToBase64(bb)
 
-	return s.repo.SaveUser(ctx, first_name, last_name, email, pass, phone, profile_picture_url, role, position_player, edad)
+	return s.repo.SaveUser(ctx, first_name, last_name, email, pass, phone, role, accepted_terms)
 }
 
 func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.User, error) {

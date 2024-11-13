@@ -287,6 +287,7 @@ para la password tiene minímo 8 caracteres
     "password": "javierPass321",
     "phone": "654987321",
     "role": "client",
+    "accepted_terms": true
   }
 ]
 ```

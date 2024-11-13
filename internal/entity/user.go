@@ -12,4 +12,5 @@ type User struct {
 	PositionPlayer    string   `db:"position_player"`
 	Age               int      `db:"age"`
 	IsVerified        bool     `db:"isVerified"`
+	AcceptedTerms     bool     `db:"accepted_terms"`
 }

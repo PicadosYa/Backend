@@ -9,8 +9,8 @@ import (
 
 const (
 	qryInsertUser = `
-	INSERT INTO users (first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	INSERT INTO users (first_name, last_name, email, password, phone, role, accepted_terms)
+	VALUES (?, ?, ?, ?, ?, ?, ?);`
 
 	qryGetUserByEmail = `
 	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, isVerified from users where email = ?;`
@@ -37,9 +37,9 @@ const (
 	qryDeleteRecoveryToken = `DELETE FROM password_recovery_tokens WHERE email = ?`
 )
 
-func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone, profile_picture_url string, role entity.UserRole, position_player string, age int) error {
+func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
 	// El cifrado de la contraseña va en service
-	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age)
+	_, err := r.db.ExecContext(ctx, qryInsertUser, first_name, last_name, email, password, phone, role, accepted_terms)
 	return err
 }
 
