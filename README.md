@@ -350,13 +350,37 @@ Al hacer este put te devolverá un ```Response: 200``` acompañado de un
 }
 ```
 
+## `PUT /users/update-user-profile`
+Este es el template para hacer el PUT, el ID se saca del token, pero es importante que se envíen todos los campos
+
+```JSON
+{
+  "first_name": "Juan",
+  "last_name": "Pérez",
+  "email": "example@gmail.com",
+  "phone": "+123456789",
+  "position_player": "forward",
+  "team_name": "Los Guerreros",
+  "age": 25,
+  "profile_picture_url": "https://example.com/profile/juan.jpg",
+  "id": 8
+}
+```
+
+Devuelve un status 200 con
+```JSON
+{
+  "message": "User updated successfully"
+}
+```
+
 # Explicación de la lógica detrás de verify user account
 Primero hay que enviar el correo, esto se hace haciéndole un post a la siguiente URL con el email del usuario.
 
 ## `POST /users/verify-user-email` 
 ```JSON
 {
-    "email":"example@gmail.com"
+  "email":"example@gmail.com"
 }
 ```
 El cual va a retornar un JSON con un código de 200 OK

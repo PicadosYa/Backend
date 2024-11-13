@@ -180,7 +180,7 @@ func (a *API) VerifyUserEmail(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, responseMessage{Message: "Recovery email sent"})
+	return c.JSON(http.StatusOK, responseMessage{Message: "Verify email sent"})
 }
 
 func (a *API) UpdateVerifyUser(c echo.Context) error {

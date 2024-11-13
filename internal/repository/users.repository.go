@@ -33,7 +33,7 @@ const (
 
 	qryUpdateUserProfile = `
 	UPDATE users
-	SET SET first_name = ?, last_name = ?, email = ?, phone = ?, position_player = ?, team_name = ?, age = ?, profile_picture_url = ?
+	SET first_name = ?, last_name = ?, email = ?, phone = ?, position_player = ?, team_name = ?, age = ?, profile_picture_url = ?
 	WHERE id = ?
 	`
 
