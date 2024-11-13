@@ -18,6 +18,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.PUT("/reset-password", a.ResetPassword)
 	users.GET("/verify", a.UpdateVerifyUser)
 	users.POST("/verify-user-email", a.VerifyUserEmail) //envía el correo
+	users.PUT("/update-user-profile", a.UpdateUserProfileInfo)
 
 	// ###################
 	// Fields Endpoints
