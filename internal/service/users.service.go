@@ -155,6 +155,7 @@ func sendEmail(templateID, email, token, name string) error {
 	personalization.AddTos(to)
 	personalization.SetDynamicTemplateData("name", name)
 	personalization.SetDynamicTemplateData("token", token)
+	personalization.SetDynamicTemplateData("email", email)
 	message.AddPersonalizations(personalization)
 	message.SetTemplateID(templateID)
 	client := sendgrid.NewSendClient(APIKEY)
