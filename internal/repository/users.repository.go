@@ -37,11 +37,11 @@ const (
 	WHERE id = ?
 	`
 
-	qryVerifyRecoveryToken = `SELECT COUNT(1) FROM password_recovery_tokens WHERE email = ? AND token = ? AND expires_at > ?`
+	qryVerifyRecoveryToken = `SELECT COUNT(1) FROM tokens_in_emails WHERE email = ? AND token = ? AND expires_at > ?`
 
 	qryUpdateUserPassword = `UPDATE users SET password = ? WHERE email = ?`
 
-	qryDeleteRecoveryToken = `DELETE FROM password_recovery_tokens WHERE email = ?`
+	qryDeleteRecoveryToken = `DELETE FROM tokens_in_emails WHERE email = ?`
 )
 
 func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {

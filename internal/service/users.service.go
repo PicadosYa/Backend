@@ -83,6 +83,7 @@ func (s *serv) SaveToken(ctx context.Context, email, token string, expiration ti
 func (s *serv) SendRecoveryEmail(email, token string) error {
 	ctx := context.Background()
 	u, err := s.repo.GetUserByEmail(ctx, email)
+  fmt.Println(u)
 	if err != nil {
 		return nil
 	}
@@ -152,9 +153,11 @@ func sendEmail(templateID, email, token, name string) error {
 	message.SetFrom(from)
 	personalization := mail.NewPersonalization()
 	to := mail.NewEmail("picadosya", email)
-	personalization.AddTos(to)
+  personalization.AddTos(to)
 	personalization.SetDynamicTemplateData("name", name)
 	personalization.SetDynamicTemplateData("token", token)
+  log.Println(email)
+  personalization.SetDynamicTemplateData("email", email)
 	message.AddPersonalizations(personalization)
 	message.SetTemplateID(templateID)
 	client := sendgrid.NewSendClient(APIKEY)
