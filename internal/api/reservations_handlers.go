@@ -1,11 +1,15 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"picadosYa/encryption"
+	"picadosYa/internal/models"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
-	"picadosYa/internal/models"
 )
 
 // GetReservations obtiene una lista de reservas
@@ -30,7 +34,6 @@ func (a *API) GetReservations(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, reservations)
 }
-
 
 // GetReservation obtiene una reserva por ID
 // @Summary Obtiene una reserva
@@ -57,7 +60,6 @@ func (a *API) GetReservation(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservation)
 }
 
-
 // CreateReservation crea una nueva reserva
 // @Summary Crea una reserva
 // @Description Crea una nueva reserva en el sistema
@@ -71,17 +73,36 @@ func (a *API) GetReservation(c echo.Context) error {
 // @Router /reservations [post]
 func (a *API) CreateReservation(c echo.Context) error {
 	ctx := c.Request().Context()
-	reservation := new(models.Reservation)
+
+	reservation := new(models.Reservation_without_id)
 	if err := c.Bind(reservation); err != nil {
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request body"})
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
 
-	if err := a.reservationService.CreateReservation(ctx, reservation); err != nil {
+	id_user, role_user, err := getUserIdAndRole(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: err.Error()})
+	}
+	layout := "2006-01-02"
+	parsedDate, err := time.Parse(layout, reservation.Date)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid date format"})
+	}
+	reservation_to_register := models.Reservation{
+		FieldID:   reservation.FieldID,
+		UserID:    id_user,
+		Date:      parsedDate,
+		StartTime: reservation.StartTime,
+		EndTime:   reservation.EndTime,
+	}
+	if role_user != "client" {
+		return c.JSON(http.StatusUnauthorized, responseError{Message: "No estás logueado como usuario"})
+	}
+	if err := a.reservationService.CreateReservation(ctx, &reservation_to_register); err != nil {
 		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	return c.JSON(http.StatusCreated, reservation)
 }
-
 
 // UpdateReservation actualiza una reserva
 // @Summary Actualiza una reserva
@@ -107,7 +128,6 @@ func (a *API) UpdateReservation(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservation)
 }
 
-
 // DeleteReservation elimina una reserva por ID
 // @Summary Elimina una reserva
 // @Description Elimina una reserva específica por ID
@@ -130,4 +150,24 @@ func (a *API) DeleteReservation(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func getUserIdAndRole(c echo.Context) (int, string, error) {
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return 0, "", err
+	}
+
+	id_user, ok1 := claims["id"].(float64)
+	role_user, ok2 := claims["role"].(string)
+	fmt.Println(claims)
+	if !ok1 || !ok2 {
+		return 0, "", fmt.Errorf("invalid token claims format")
+	}
+
+	idUser := int(id_user)
+	return idUser, role_user, nil
 }

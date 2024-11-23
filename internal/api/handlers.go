@@ -120,16 +120,7 @@ func (a *API) ResetPassword(c echo.Context) error {
 
 func (a *API) GetExpiration(c echo.Context) error {
 	tokenStr := c.Request().Header.Get("Authorization")
-	cookie, err := c.Cookie("Authorization")
-	if err != nil && err == http.ErrNoCookie {
-		return c.JSON(http.StatusUnauthorized, responseMessage{Message: "No hay cookie"})
-	}
-
-	if tokenStr == "" {
-		tokenStr = cookie.Value
-	} else {
-		tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	}
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 	tkn, err := encryption.ParseLoginJWT(tokenStr)
 	if err != nil {
 		log.Println(tokenStr)

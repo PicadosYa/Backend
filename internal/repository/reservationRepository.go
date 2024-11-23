@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
+
+	"picadosYa/internal/models"
 
 	"github.com/jmoiron/sqlx"
-	"picadosYa/internal/models"
 )
 
 type IReservationRepository interface {
@@ -35,9 +35,9 @@ func (r *reservationRepository) SaveReservation(ctx context.Context, reservation
 		query,
 		reservation.FieldID,
 		reservation.UserID,
+		reservation.Date,
 		reservation.StartTime,
 		reservation.EndTime,
-		time.Now(),
 	)
 	if err != nil {
 		log.Fatal("Error executing InsertReservation: ", err)
@@ -71,7 +71,6 @@ func (r *reservationRepository) UpdateReservation(ctx context.Context, reservati
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		reservation.Id,
 		reservation.FieldID,
 		reservation.UserID,
 		reservation.StartTime,
