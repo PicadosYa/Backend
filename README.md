@@ -463,6 +463,31 @@ aunque le pagues
 
 `Response: 201`
 
+## `GET /reservations/reservations-per-user/:id`
+Devuelve un array con todas las reservas del usuario y su estado
+```JSON
+[
+    {
+        "EmailUser": "simonpintos771@gmail.com",
+        "ReservationDate": "2024-10-15T00:00:00Z",
+        "StartTime": "19:00:00",
+        "EndTime": "23:00:00",
+        "FieldName": "Cancha Test",
+        "StatusReservation": "reserved"
+    },
+    {
+        "EmailUser": "simonpintos771@gmail.com",
+        "ReservationDate": "2024-11-30T00:00:00Z",
+        "StartTime": "14:00:00",
+        "EndTime": "18:00:00",
+        "FieldName": "2 a 1 Fútbol 5",
+        "StatusReservation": "reserved"
+    }
+]
+```
+
+`Response: 200`
+
 ## `PUT /reservations/:id`
 Sirve para actualizar una reserva: </br></br>
 <b>Ejemplo de Request Body: </b>
