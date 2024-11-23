@@ -91,6 +91,10 @@ func (s *serv) SendRecoveryEmail(email, token string) error {
 	return sendEmail(templateID, email, token, u.FirstName)
 }
 
+func (s *serv) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
+	return s.repo.GetUserByID(ctx, id)
+}
+
 func (s *serv) ResetPassword(ctx context.Context, email, token, newPassword string) error {
 	//Verifica el token
 	valid, err := s.repo.VerifyRecoveryToken(ctx, email, token)

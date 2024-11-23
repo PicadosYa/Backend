@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"picadosYa/encryption"
 	"picadosYa/internal/api/dtos"
+	"picadosYa/internal/models"
 	"picadosYa/internal/service"
 	"picadosYa/utils"
 	"strings"
@@ -91,6 +92,38 @@ func (a *API) LoginUser(c echo.Context) error {
 		"user":  userCreated,
 		"token": token,
 	})
+}
+
+func (a *API) GetUserByID(c echo.Context) error {
+	ctx := c.Request().Context()
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+	id_user, ok1 := claims["id"].(float64)
+	if ok1 != true {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+	user, err := a.serv.GetUserByID(ctx, idUser)
+
+	userToFront := models.User{
+		ID:                user.ID,
+		FirstName:         user.FirstName,
+		LastName:          user.LastName,
+		Email:             user.Email,
+		Phone:             user.Phone,
+		ProfilePictureUrl: user.ProfilePictureUrl,
+		Role:              user.Role,
+		PositionPlayer:    user.ProfilePictureUrl,
+		Age:               user.Age,
+		IsVerified:        user.IsVerified,
+	}
+	return c.JSON(http.StatusOK, userToFront)
+
 }
 
 func (a *API) ResetPassword(c echo.Context) error {

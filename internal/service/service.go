@@ -26,6 +26,7 @@ type Service interface {
 	DeleteRecoveryToken(ctx context.Context, email string) error
 	UpdateUserPassword(ctx context.Context, email string, hashedPassword string) error
 	UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error
+	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 }
 
 type serv struct {

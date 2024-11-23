@@ -294,6 +294,24 @@ para la password tiene minímo 8 caracteres
 
 Retorna un Json con el usuario y un ```Response: 201```
 
+## `GET /users/check-info`
+El ID del usuario lo obtiene solo gracias al token que hay que mandarle en Authorization en el Header
+
+Retorna un 
+```JSON
+{
+    "id": 16,
+    "first_name": "Juan",
+    "last_name": "Pérezzila",
+    "email": "simonpintos771@gmail.com",
+    "phone": "+123456789",
+    "profile_picture_url": "https://example.com/profile/juan.jpg",
+    "role": "client",
+    "position_player": "https://example.com/profile/juan.jpg",
+    "age": 25,
+    "isVerified": false
+}
+```
 ## `POST /users/login`
 Este endpoint te loguea con esta entrada
 ```JSON

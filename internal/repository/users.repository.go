@@ -16,6 +16,9 @@ const (
 	qryGetUserByEmail = `
 	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, isVerified from users where email = ?;`
 
+	qryGetUserByID = `
+	select id, first_name, last_name, email, password, phone, profile_picture_url, role, position_player, age, isVerified from users where id = ?;`
+
 	qryInsertToken = `
     INSERT INTO tokens_in_emails (email, token, expires_at)
     VALUES (?, ?, ?);
@@ -55,6 +58,15 @@ func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, passw
 func (r *repo) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	u := &entity.User{}
 	err := r.db.GetContext(ctx, u, qryGetUserByEmail, email)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (r *repo) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
+	u := &entity.User{}
+	err := r.db.GetContext(ctx, u, qryGetUserByID, id)
 	if err != nil {
 		return nil, err
 	}
