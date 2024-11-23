@@ -16,3 +16,12 @@ type Reservation struct {
 	StartTime string    `json:"start_time" db:"start_time"`
 	EndTime   string    `json:"end_time" db:"end_time"`
 }
+
+type Reservations_Result struct {
+	EmailUser         string
+	ReservationDate   string
+	StartTime         string
+	EndTime           string
+	FieldName         string
+	StatusReservation string
+}

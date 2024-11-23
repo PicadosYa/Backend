@@ -447,17 +447,18 @@ Trae una reserva en particular. EJ:
 
 ## `POST /reservations`
 Sirve para insertar una nueva reserva: </br></br>
+Advertencia: el usuario debe tener el rol de cliente, debe estar con sesión iniciada y con el Authorization Bearer {token}, sino, no te va a funcionar
+aunque le pagues
 <b>Ejemplo de Request Body: </b>
 
 ```JSON
-{
-  "field_id": 1,
-  "date": "2024-10-15",
-  "start_time": "19:00",
-  "end_time": "23:00",
-  "user_id": 1,
-  "status": "pending"
+{  
+  "field_id": 3, 
+ "date": "2024-10-15",  
+ "start_time": "19:00:00",  
+ "end_time": "23:00:00"
 }
+
 ```
 
 `Response: 201`

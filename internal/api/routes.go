@@ -40,4 +40,5 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	reservations.POST("", a.CreateReservation)
 	reservations.PUT("/:id", a.UpdateReservation)
 	reservations.DELETE("/:id", a.DeleteReservation)
+	reservations.GET("/reservations-per-user/:id", a.GetReservationsPerUser)
 }

@@ -152,6 +152,21 @@ func (a *API) DeleteReservation(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+func (a *API) GetReservationsPerUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid user ID")
+	}
+
+	reservationesFromService, err := a.reservationService.GetReservationsPerUser(ctx, id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, reservationesFromService)
+}
+
 func getUserIdAndRole(c echo.Context) (int, string, error) {
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")

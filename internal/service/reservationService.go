@@ -14,6 +14,7 @@ type ReservationService interface {
 	CreateReservation(ctx context.Context, reservation *models.Reservation) error
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
+	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
 }
 
 type reservationService struct {
@@ -29,6 +30,10 @@ func NewReservationService(repo repository.IReservationRepository) ReservationSe
 func (s *reservationService) SaveReservation(ctx context.Context, reservation *models.Reservation) error {
 	log.Println("Saving reservation")
 	return s.repo.SaveReservation(ctx, reservation)
+}
+
+func (s *reservationService) GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error) {
+	return s.repo.GetReservationsPerUser(ctx, id)
 }
 
 func (s *reservationService) GetReservation(ctx context.Context, id int) (*models.Reservation, error) {
