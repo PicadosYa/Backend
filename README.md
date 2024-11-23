@@ -296,7 +296,7 @@ Retorna un Json con el usuario y un ```Response: 201```
 
 ## `GET /users/check-info`
 El ID del usuario lo obtiene solo gracias al token que hay que mandarle en Authorization en el Header
-
+No hay que mandarle nada en el body
 Retorna un 
 ```JSON
 {
@@ -312,6 +312,9 @@ Retorna un
     "isVerified": false
 }
 ```
+
+```Response: 200```
+
 ## `POST /users/login`
 Este endpoint te loguea con esta entrada
 ```JSON
