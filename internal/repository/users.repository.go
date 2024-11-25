@@ -45,6 +45,8 @@ const (
 	qryUpdateUserPassword = `UPDATE users SET password = ? WHERE email = ?`
 
 	qryDeleteRecoveryToken = `DELETE FROM tokens_in_emails WHERE email = ?`
+
+	qryGetAllFavouritesPerUser = `CALL GET_USER_FAVORITE_FIELDS(?);`
 )
 
 func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
@@ -106,6 +108,32 @@ func (r *repo) CreateOrRemoveFavourite(ctx context.Context, id_user, id_field in
 
 	}
 	return nil
+}
+
+func (r *repo) GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error) {
+
+	rows, err := r.db.QueryContext(ctx, qryGetAllFavouritesPerUser, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var favourites []dtos.FavsResults
+
+	for rows.Next() {
+		var favourite dtos.FavsResults
+		err := rows.Scan(&favourite.Field_name, &favourite.Address, &favourite.Field_phone, &favourite.Logo_url)
+		if err != nil {
+			return nil, err
+		}
+		favourites = append(favourites, favourite)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return favourites, nil
 }
 
 func (r *repo) SaveToken(ctx context.Context, email, token string, expiration time.Time) error {

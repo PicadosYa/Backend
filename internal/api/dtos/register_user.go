@@ -40,3 +40,10 @@ type UpdateUser struct {
 	ProfilePictureUrl string `json:"profile_picture_url"`
 	ID                int    `json:"id"`
 }
+
+type FavsResults struct {
+	Field_name  string `json:"field_name"`
+	Address     string `json:"field_address"`
+	Field_phone string `json:"field_phone"`
+	Logo_url    string `json:"field_logo_url"`
+}

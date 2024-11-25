@@ -23,6 +23,7 @@ type Repository interface {
 	DeleteRecoveryToken(ctx context.Context, email string) error
 	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 	CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error
+	GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error)
 }
 
 type repo struct {

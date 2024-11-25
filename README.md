@@ -371,16 +371,6 @@ Al hacer este put te devolverá un ```Response: 200``` acompañado de un
 }
 ```
 
-## `POST /users/add-favourites`
-Para agregar a favoritos una cancha hay que enviar este JSON al endpoint
-```JSON
-{
-    "field_id": 12
-}
-```
-
-Lo cual retorna un ```Response: 200```
-
 ## `PUT /users/update-user-profile`
 Este es el template para hacer el PUT, el ID se saca del token, pero es importante que se envíen todos los campos
 
@@ -423,6 +413,52 @@ El cual va a retornar un JSON con un código de 200 OK
 Después de que llegue el mail, apretas en el botón de "Verificar cuenta" y te va a llevar a la url http://localhost:8080/api/users/verify?token=034527
 
 Al darle al botón en el mail te va a hacer un GET a la ruta: localhost:8080/api/users/verify?token=034527 Y automáticamente el usuario va a ser verificado y ya va a estar todo listo.
+
+
+## `POST /users/add-favourites`
+No olvidarse de mandar el token por Authorization
+Para agregar a favoritos una cancha hay que enviar este JSON al endpoint
+```JSON
+{
+    "field_id": 12
+}
+```
+
+Lo cual retorna un ```Response: 200```
+
+## `GET /users/favourites-per-user`
+No olvidarse de mandar el token por Authorization
+Retorna 
+```JSON
+[
+    {
+        "field_name": "Aguada Fútbol 5",
+        "field_address": "Av. Gral. San Martín 2261",
+        "field_phone": "2201 0927",
+        "field_logo_url": "https://canchea.com/uy/wp-content/uploads/sites/2/2013/05/aguada.png"
+    },
+    {
+        "field_name": "Cancha Test",
+        "field_address": "",
+        "field_phone": "",
+        "field_logo_url": ""
+    },
+    {
+        "field_name": "0 Stress",
+        "field_address": "Guaviyu 3013 esq. Gral. Flores",
+        "field_phone": "2711 1332",
+        "field_logo_url": ""
+    },
+    {
+        "field_name": "Campo Grande",
+        "field_address": "Av. Gral. Garibaldi 1892",
+        "field_phone": "2200 3129",
+        "field_logo_url": "https://canchea.com/uy/wp-content/uploads/sites/2/2013/11/campogrande.png"
+    }
+]
+``` 
+
+con un ```Response: 200```
 
 # Documentación de la API de Reservas
 
@@ -494,7 +530,8 @@ aunque le pagues
 
 `Response: 201`
 
-## `GET /reservations/reservations-per-user/:id`
+## `GET /reservations/reservations-per-user`
+No olvidarse de enviar el token por Authorization: Bearer {token}
 Devuelve un array con todas las reservas del usuario y su estado
 ```JSON
 [

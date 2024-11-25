@@ -152,6 +152,10 @@ func (s *serv) GetUserByToken(ctx context.Context, token string) (*dtos.VerifyUs
 	return s.repo.GetUserByToken(ctx, token)
 }
 
+func (s *serv) GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error) {
+	return s.repo.GetFavouritesPerUser(ctx, id)
+}
+
 func (s *serv) UpdateUserVerification(ctx context.Context, email string) error {
 	return s.repo.UpdateUserVerification(ctx, email)
 }

@@ -28,6 +28,7 @@ type Service interface {
 	UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error
 	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 	CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error
+	GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error)
 }
 
 type serv struct {
