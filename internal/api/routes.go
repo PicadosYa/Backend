@@ -20,6 +20,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.POST("/verify-user-email", a.VerifyUserEmail) //envía el correo
 	users.PUT("/update-user-profile", a.UpdateUserProfileInfo)
 	users.GET("/check-info", a.GetUserByID)
+	users.POST("/add-favourites", a.CreateOrRemoveFavourite)
 
 	// ###################
 	// Fields Endpoints

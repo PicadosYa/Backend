@@ -371,6 +371,16 @@ Al hacer este put te devolverá un ```Response: 200``` acompañado de un
 }
 ```
 
+## `POST /users/add-favourites`
+Para agregar a favoritos una cancha hay que enviar este JSON al endpoint
+```JSON
+{
+    "field_id": 12
+}
+```
+
+Lo cual retorna un ```Response: 200```
+
 ## `PUT /users/update-user-profile`
 Este es el template para hacer el PUT, el ID se saca del token, pero es importante que se envíen todos los campos
 

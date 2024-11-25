@@ -68,6 +68,11 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 	}, nil
 }
 
+// Logica de favorito
+func (s *serv) CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error {
+	return s.repo.CreateOrRemoveFavourite(ctx, id_user, id_field)
+}
+
 func (s *serv) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	return s.repo.GetUserByEmail(ctx, email)
 }

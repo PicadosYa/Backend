@@ -73,6 +73,41 @@ func (r *repo) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
 	return u, nil
 }
 
+func (r *repo) CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error {
+	var exists bool
+	queryCheck := `
+        SELECT EXISTS(
+            SELECT 1
+            FROM user_favorite_fields
+            WHERE user_id = ? AND field_id = ?
+        )`
+	err := r.db.QueryRow(queryCheck, id_user, id_field).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if exists {
+		// Si existe, eliminar el registro
+		queryDelete := `
+            DELETE FROM user_favorite_fields
+            WHERE user_id = ? AND field_id = ?`
+		_, err := r.db.Exec(queryDelete, id_user, id_field)
+		if err != nil {
+			return err
+		}
+	} else {
+		// Si no existe, insertar el registro
+		queryInsert := `
+            INSERT INTO user_favorite_fields (user_id, field_id)
+            VALUES (?, ?)`
+		_, err := r.db.Exec(queryInsert, id_user, id_field)
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
+}
+
 func (r *repo) SaveToken(ctx context.Context, email, token string, expiration time.Time) error {
 	_, err := r.db.ExecContext(ctx, qryInsertToken, email, token, expiration)
 	return err
