@@ -12,4 +12,5 @@ type User struct {
 	Role              entity.UserRole `json:"role"`
 	PositionPlayer    string          `json:"position_player"`
 	Age               int             `json:"age"`
+	IsVerified        bool            `json:"isVerified"`
 }

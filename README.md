@@ -287,11 +287,33 @@ para la password tiene minímo 8 caracteres
     "password": "javierPass321",
     "phone": "654987321",
     "role": "client",
+    "accepted_terms": true
   }
 ]
 ```
 
 Retorna un Json con el usuario y un ```Response: 201```
+
+## `GET /users/check-info`
+El ID del usuario lo obtiene solo gracias al token que hay que mandarle en Authorization en el Header
+No hay que mandarle nada en el body
+Retorna un 
+```JSON
+{
+    "id": 16,
+    "first_name": "Juan",
+    "last_name": "Pérezzila",
+    "email": "simonpintos771@gmail.com",
+    "phone": "+123456789",
+    "profile_picture_url": "https://example.com/profile/juan.jpg",
+    "role": "client",
+    "position_player": "https://example.com/profile/juan.jpg",
+    "age": 25,
+    "isVerified": false
+}
+```
+
+```Response: 200```
 
 ## `POST /users/login`
 Este endpoint te loguea con esta entrada
@@ -349,6 +371,49 @@ Al hacer este put te devolverá un ```Response: 200``` acompañado de un
 }
 ```
 
+## `PUT /users/update-user-profile`
+Este es el template para hacer el PUT, el ID se saca del token, pero es importante que se envíen todos los campos
+
+```JSON
+{
+  "first_name": "Juan",
+  "last_name": "Pérez",
+  "email": "example@gmail.com",
+  "phone": "+123456789",
+  "position_player": "forward",
+  "team_name": "Los Guerreros",
+  "age": 25,
+  "profile_picture_url": "https://example.com/profile/juan.jpg",
+  "id": 8
+}
+```
+
+Devuelve un status 200 con
+```JSON
+{
+  "message": "User updated successfully"
+}
+```
+
+# Explicación de la lógica detrás de verify user account
+Primero hay que enviar el correo, esto se hace haciéndole un post a la siguiente URL con el email del usuario.
+
+## `POST /users/verify-user-email` 
+```JSON
+{
+  "email":"example@gmail.com"
+}
+```
+El cual va a retornar un JSON con un código de 200 OK
+```JSON
+{
+    "message": "Recovery email sent"
+}
+```
+Después de que llegue el mail, apretas en el botón de "Verificar cuenta" y te va a llevar a la url http://localhost:8080/api/users/verify?token=034527
+
+Al darle al botón en el mail te va a hacer un GET a la ruta: localhost:8080/api/users/verify?token=034527 Y automáticamente el usuario va a ser verificado y ya va a estar todo listo.
+
 # Documentación de la API de Reservas
 
 ## `GET /reservations`
@@ -403,20 +468,46 @@ Trae una reserva en particular. EJ:
 
 ## `POST /reservations`
 Sirve para insertar una nueva reserva: </br></br>
+Advertencia: el usuario debe tener el rol de cliente, debe estar con sesión iniciada y con el Authorization Bearer {token}, sino, no te va a funcionar
+aunque le pagues
 <b>Ejemplo de Request Body: </b>
 
 ```JSON
-{
-  "field_id": 1,
-  "date": "2024-10-15",
-  "start_time": "19:00",
-  "end_time": "23:00",
-  "user_id": 1,
-  "status": "pending"
+{  
+  "field_id": 3, 
+ "date": "2024-10-15",  
+ "start_time": "19:00:00",  
+ "end_time": "23:00:00"
 }
+
 ```
 
 `Response: 201`
+
+## `GET /reservations/reservations-per-user/:id`
+Devuelve un array con todas las reservas del usuario y su estado
+```JSON
+[
+    {
+        "EmailUser": "simonpintos771@gmail.com",
+        "ReservationDate": "2024-10-15T00:00:00Z",
+        "StartTime": "19:00:00",
+        "EndTime": "23:00:00",
+        "FieldName": "Cancha Test",
+        "StatusReservation": "reserved"
+    },
+    {
+        "EmailUser": "simonpintos771@gmail.com",
+        "ReservationDate": "2024-11-30T00:00:00Z",
+        "StartTime": "14:00:00",
+        "EndTime": "18:00:00",
+        "FieldName": "2 a 1 Fútbol 5",
+        "StatusReservation": "reserved"
+    }
+]
+```
+
+`Response: 200`
 
 ## `PUT /reservations/:id`
 Sirve para actualizar una reserva: </br></br>

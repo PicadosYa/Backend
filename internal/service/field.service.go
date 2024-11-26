@@ -26,17 +26,22 @@ type fieldService struct {
 	fileRepo repository.IFileRepository
 }
 
-func NewFieldService(repo repository.IFieldRepository) FieldService {
+func NewFieldService(repo repository.IFieldRepository, fileRepo repository.IFileRepository) FieldService {
 	return &fieldService{
-		repo: repo,
+		repo:     repo,
+		fileRepo: fileRepo,
 	}
 }
 
 func (s *fieldService) SaveField(ctx context.Context, field *models.Field, files *map[string][]*multipart.FileHeader) error {
 	log.Println("Saving field")
+	log.Printf("Files: %v", files)
 	for key, fileHeaders := range *files {
 		if key == "fieldImages" {
+			log.Println(key)
+			log.Printf("fileHeaders: %v", fileHeaders)
 			for _, fileHeader := range fileHeaders {
+				log.Printf("fileHeader: %s", fileHeader.Filename)
 				photo, err := s.fileRepo.UploadFile(fileHeader, fileHeader.Filename+"_"+uuid.New().String())
 				if err != nil {
 					return err

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
+
+	"picadosYa/internal/models"
 
 	"github.com/jmoiron/sqlx"
-	"picadosYa/internal/models"
 )
 
 type IReservationRepository interface {
@@ -16,6 +16,7 @@ type IReservationRepository interface {
 	GetReservations(ctx context.Context, limit, offset int) ([]models.Reservation, error)
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
+	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
 }
 
 type reservationRepository struct {
@@ -35,15 +36,43 @@ func (r *reservationRepository) SaveReservation(ctx context.Context, reservation
 		query,
 		reservation.FieldID,
 		reservation.UserID,
+		reservation.Date,
 		reservation.StartTime,
 		reservation.EndTime,
-		time.Now(),
 	)
 	if err != nil {
 		log.Fatal("Error executing InsertReservation: ", err)
 		return fmt.Errorf("error executing InsertReservation: %w", err)
 	}
 	return nil
+}
+
+func (r *reservationRepository) GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error) {
+
+	query := `CALL GetReservationsByUserId(?)`
+
+	rows, err := r.db.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []models.Reservations_Result
+
+	for rows.Next() {
+		var reservation models.Reservations_Result
+		err := rows.Scan(&reservation.EmailUser, &reservation.ReservationDate, &reservation.StartTime, &reservation.EndTime, &reservation.FieldName, &reservation.StatusReservation)
+		if err != nil {
+			return nil, err
+		}
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
 }
 
 func (r *reservationRepository) GetReservation(ctx context.Context, id int) (*models.Reservation, error) {
@@ -71,7 +100,6 @@ func (r *reservationRepository) UpdateReservation(ctx context.Context, reservati
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		reservation.Id,
 		reservation.FieldID,
 		reservation.UserID,
 		reservation.StartTime,

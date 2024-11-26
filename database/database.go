@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"picadosYa/settings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
-func New(ctx context.Context, s *settings.Settings) (*sqlx.DB, error) {
+func New(ctx context.Context) (*sqlx.DB, error) {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
@@ -24,7 +23,7 @@ func New(ctx context.Context, s *settings.Settings) (*sqlx.DB, error) {
 
 	var db *sqlx.DB
 	var err error
-	for i := 0; i < 3; i++ { // Intenta 3 veces
+	for i := 0; i < 10; i++ { // Intenta 10 veces
 		db, err = sqlx.ConnectContext(ctx, "mysql", connectionString)
 		if err == nil {
 			return db, nil

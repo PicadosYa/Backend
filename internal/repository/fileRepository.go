@@ -20,7 +20,7 @@ type Cloudinary struct {
 	Ctx context.Context
 }
 
-func NewCloudinary() *Cloudinary {
+func NewCloudinary() IFileRepository {
 	// Add your Cloudinary credentials, set configuration parameter
 	// Secure=true to return "https" URLs, and create a context
 	//===================
@@ -34,6 +34,7 @@ func (c *Cloudinary) UploadFile(file interface{}, publicID string) (string, erro
 
 	// Upload the image.
 	// Set the asset's public ID and allow overwriting the asset with new versions
+	log.Println(publicID)
 	resp, err := c.Cld.Upload.Upload(c.Ctx, file, uploader.UploadParams{
 		PublicID:       publicID,
 		UniqueFilename: api.Bool(false),
@@ -42,7 +43,7 @@ func (c *Cloudinary) UploadFile(file interface{}, publicID string) (string, erro
 		log.Panic(err)
 		return "", err
 	}
-
+	log.Printf("****1. Upload an image****\nResp %v", resp.Error)
 	// Log the delivery URL
 	log.Println("****2. Upload an image****\nDelivery URL:", resp.SecureURL)
 	return resp.SecureURL, nil

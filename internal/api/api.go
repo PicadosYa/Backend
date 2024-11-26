@@ -28,9 +28,9 @@ func (a *API) Start(e *echo.Echo, address string) error {
 	a.RegisterRoutes(e)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://127.0.0.1:5500", "http://localhost:5500"},
+		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.PATCH, echo.DELETE},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		AllowCredentials: true,
 	}))
 
