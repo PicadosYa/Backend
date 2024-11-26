@@ -20,6 +20,8 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.POST("/verify-user-email", a.VerifyUserEmail) //envía el correo
 	users.PUT("/update-user-profile", a.UpdateUserProfileInfo)
 	users.GET("/check-info", a.GetUserByID)
+	users.POST("/add-favourites", a.CreateOrRemoveFavourite)
+	users.GET("/favourites-per-user", a.GetFavouritesPerUser)
 
 	// ###################
 	// Fields Endpoints
@@ -41,5 +43,10 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	reservations.POST("", a.CreateReservation)
 	reservations.PUT("/:id", a.UpdateReservation)
 	reservations.DELETE("/:id", a.DeleteReservation)
-	reservations.GET("/reservations-per-user/:id", a.GetReservationsPerUser)
+	reservations.GET("/reservations-per-user", a.GetReservationsPerUser)
+
+	// ###################
+	// Payment Endpoints
+	// ###################
+	apiGroup.POST("/create_preference", a.PaymentPrincipal)
 }

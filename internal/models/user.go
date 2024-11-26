@@ -14,3 +14,7 @@ type User struct {
 	Age               int             `json:"age"`
 	IsVerified        bool            `json:"isVerified"`
 }
+
+type Fav struct {
+	FieldID int `json:"field_id" binding:"required"`
+}

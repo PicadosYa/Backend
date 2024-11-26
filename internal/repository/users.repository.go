@@ -45,6 +45,8 @@ const (
 	qryUpdateUserPassword = `UPDATE users SET password = ? WHERE email = ?`
 
 	qryDeleteRecoveryToken = `DELETE FROM tokens_in_emails WHERE email = ?`
+
+	qryGetAllFavouritesPerUser = `CALL GET_USER_FAVORITE_FIELDS(?);`
 )
 
 func (r *repo) SaveUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
@@ -71,6 +73,67 @@ func (r *repo) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
 		return nil, err
 	}
 	return u, nil
+}
+
+func (r *repo) CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error {
+	var exists bool
+	queryCheck := `
+        SELECT EXISTS(
+            SELECT 1
+            FROM user_favorite_fields
+            WHERE user_id = ? AND field_id = ?
+        )`
+	err := r.db.QueryRow(queryCheck, id_user, id_field).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if exists {
+		// Si existe, eliminar el registro
+		queryDelete := `
+            DELETE FROM user_favorite_fields
+            WHERE user_id = ? AND field_id = ?`
+		_, err := r.db.Exec(queryDelete, id_user, id_field)
+		if err != nil {
+			return err
+		}
+	} else {
+		// Si no existe, insertar el registro
+		queryInsert := `
+            INSERT INTO user_favorite_fields (user_id, field_id)
+            VALUES (?, ?)`
+		_, err := r.db.Exec(queryInsert, id_user, id_field)
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
+}
+
+func (r *repo) GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error) {
+
+	rows, err := r.db.QueryContext(ctx, qryGetAllFavouritesPerUser, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var favourites []dtos.FavsResults
+
+	for rows.Next() {
+		var favourite dtos.FavsResults
+		err := rows.Scan(&favourite.Field_name, &favourite.Address, &favourite.Field_phone, &favourite.Logo_url)
+		if err != nil {
+			return nil, err
+		}
+		favourites = append(favourites, favourite)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return favourites, nil
 }
 
 func (r *repo) SaveToken(ctx context.Context, email, token string, expiration time.Time) error {

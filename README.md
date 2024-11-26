@@ -414,6 +414,52 @@ Después de que llegue el mail, apretas en el botón de "Verificar cuenta" y te 
 
 Al darle al botón en el mail te va a hacer un GET a la ruta: localhost:8080/api/users/verify?token=034527 Y automáticamente el usuario va a ser verificado y ya va a estar todo listo.
 
+
+## `POST /users/add-favourites`
+No olvidarse de mandar el token por Authorization
+Para agregar a favoritos una cancha hay que enviar este JSON al endpoint
+```JSON
+{
+    "field_id": 12
+}
+```
+
+Lo cual retorna un ```Response: 200```
+
+## `GET /users/favourites-per-user`
+No olvidarse de mandar el token por Authorization
+Retorna 
+```JSON
+[
+    {
+        "field_name": "Aguada Fútbol 5",
+        "field_address": "Av. Gral. San Martín 2261",
+        "field_phone": "2201 0927",
+        "field_logo_url": "https://canchea.com/uy/wp-content/uploads/sites/2/2013/05/aguada.png"
+    },
+    {
+        "field_name": "Cancha Test",
+        "field_address": "",
+        "field_phone": "",
+        "field_logo_url": ""
+    },
+    {
+        "field_name": "0 Stress",
+        "field_address": "Guaviyu 3013 esq. Gral. Flores",
+        "field_phone": "2711 1332",
+        "field_logo_url": ""
+    },
+    {
+        "field_name": "Campo Grande",
+        "field_address": "Av. Gral. Garibaldi 1892",
+        "field_phone": "2200 3129",
+        "field_logo_url": "https://canchea.com/uy/wp-content/uploads/sites/2/2013/11/campogrande.png"
+    }
+]
+``` 
+
+con un ```Response: 200```
+
 # Documentación de la API de Reservas
 
 ## `GET /reservations`
@@ -484,7 +530,8 @@ aunque le pagues
 
 `Response: 201`
 
-## `GET /reservations/reservations-per-user/:id`
+## `GET /reservations/reservations-per-user`
+No olvidarse de enviar el token por Authorization: Bearer {token}
 Devuelve un array con todas las reservas del usuario y su estado
 ```JSON
 [
