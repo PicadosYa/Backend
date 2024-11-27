@@ -15,7 +15,8 @@ import (
 )
 
 type responseMessage struct {
-	Message string `json:"message"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 type responseError struct {
 	Message string `json:"message"`
@@ -302,26 +303,67 @@ func (a *API) RequestPasswordRecovery(c echo.Context) error {
 
 func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 	ctx := c.Request().Context()
-	params := dtos.UpdateUser{}
-	err := c.Bind(&params)
-	if err != nil {
+	form, err := c.MultipartForm()
+	log.Printf("form: %v", form)
+	// Parsear los datos del formulario
+	params := new(dtos.UpdateUser)
+	if err := c.Bind(params); err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid request"})
 	}
 
-	// valida lo que tenemos asignado en el dto
-	err = a.dataValidator.Struct(params)
-	if err != nil {
+	// Validar los parámetros del DTO
+	if err := a.dataValidator.Struct(params); err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
 
-	err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email, params.Phone, params.PositionPlayer, params.TeamName, params.Age, params.ProfilePictureUrl, params.ID)
-	if err != nil {
-		if err == service.ErrUserAlreadyExists {
-			return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
-		}
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
+	// Obtener el archivo de imagen de perfil
+	file, err := c.FormFile("profilePicture")
+	if err != nil && err != http.ErrMissingFile {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Error processing profile picture"})
 	}
 
-	return c.JSON(http.StatusOK, responseMessage{Message: "User updated successfully"})
+	var profilePictureURL string
+	if file != nil {
+		// Si se proporcionó un archivo, subirlo
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Error opening file"})
+		}
+		defer src.Close()
+
+		// Llamar al servicio con el archivo
+		profilePictureURL, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
+			params.Phone, params.PositionPlayer, params.TeamName, params.Age, file, params.ID)
+		if err != nil {
+			if err == service.ErrUserAlreadyExists {
+				return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
+			}
+			log.Println(err)
+			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
+		}
+	} else {
+		// Si no se proporcionó archivo, llamar al servicio sin archivo
+		profilePictureURL, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
+			params.Phone, params.PositionPlayer, params.TeamName, params.Age, nil, params.ID)
+		if err != nil {
+			if err == service.ErrUserAlreadyExists {
+				return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
+			}
+			log.Println(err)
+			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "internal server error"})
+		}
+	}
+
+	return c.JSON(http.StatusOK, dtos.UpdateUser{
+		ID:                params.ID,
+		FirstName:         params.FirstName,
+		LastName:          params.LastName,
+		Email:             params.Email,
+		Phone:             params.Phone,
+		PositionPlayer:    params.PositionPlayer,
+		TeamName:          params.TeamName,
+		Age:               params.Age,
+		ProfilePictureUrl: profilePictureURL,
+	},
+	)
 }

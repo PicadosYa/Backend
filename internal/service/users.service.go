@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"mime/multipart"
 	"picadosYa/encryption"
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
@@ -183,6 +185,23 @@ func sendEmail(templateID, email, token, name string) error {
 	return nil
 }
 
-func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error {
-	return s.repo.UpdateUserProfileInfo(ctx, first_name, last_name, email, phone, position_player, team_name, age, profile_picture_url, id)
+func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, file *multipart.FileHeader, id int) (string, error) {
+	var profilePictureURL string
+	var err error
+
+	// Si se proporcionó un archivo, subirlo
+	if file != nil {
+		profilePictureURL, err = s.fileRepo.UploadFile(file, fmt.Sprintf("profile_%d_%s", id, uuid.New().String()))
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// Actualizar la información del usuario en el repositorio
+	err = s.repo.UpdateUserProfileInfo(ctx, first_name, last_name, email, phone, position_player, team_name, age, profilePictureURL, id)
+	if err != nil {
+		return "", err
+	}
+
+	return profilePictureURL, nil
 }
