@@ -354,16 +354,21 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, dtos.UpdateUser{
-		ID:                params.ID,
+  token, err := encryption.SignedLoginToken(&models.User{
+		ID:                int64(params.ID),
 		FirstName:         params.FirstName,
 		LastName:          params.LastName,
 		Email:             params.Email,
 		Phone:             params.Phone,
 		PositionPlayer:    params.PositionPlayer,
-		TeamName:          params.TeamName,
 		Age:               params.Age,
-		ProfilePictureUrl: profilePictureURL,
-	},
-	)
+		ProfilePictureUrl: profilePictureURL,    
+  })
+
+  if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "token error"})
+	}
+	return c.JSON(http.StatusOK, map[string]string{
+    token: token,
+  })
 }
