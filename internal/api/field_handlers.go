@@ -84,17 +84,26 @@ func (a *API) GetField(c echo.Context) error {
 
 func (a *API) CreateField(c echo.Context) error {
 	ctx := c.Request().Context()
+	formFiles, err := c.MultipartForm()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
+	}
+	files := formFiles.File
+	if len(files) == 0 {
+		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: "No files provided"})
+	}
+
 	field := new(models.Field)
 	if err := c.Bind(field); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
 	}
 	log.Println("Bind data successful")
 	if err := a.dataValidator.Struct(field); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
 	}
 	log.Println("Validation successful")
-	if err := a.fieldService.SaveField(ctx, field); err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+	if err := a.fieldService.SaveField(ctx, field, &files); err != nil {
+		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	log.Println("Save field successful")
 	return c.NoContent(http.StatusCreated)

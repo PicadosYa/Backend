@@ -30,15 +30,15 @@ type LoguedUser struct {
 }
 
 type UpdateUser struct {
-	FirstName         string `json:"first_name"`
-	LastName          string `json:"last_name"`
-	Email             string `json:"email"`
-	Phone             string `json:"phone"`
-	PositionPlayer    string `json:"position_player"`
-	TeamName          string `json:"team_name"`
-	Age               int    `json:"age"`
-	ProfilePictureUrl string `json:"profile_picture_url"`
-	ID                int    `json:"id"`
+	FirstName         string `json:"first_name" form:"first_name"`
+	LastName          string `json:"last_name" form:"last_name"`
+	Email             string `json:"email" form:"email"`
+	Phone             string `json:"phone" form:"phone"`
+	PositionPlayer    string `json:"position_player" form:"position_player"`
+	TeamName          string `json:"team_name" form:"team_name"`
+	Age               int    `json:"age" form:"age"`
+	ProfilePictureUrl string `json:"profile_picture_url" form:"profile_picture_url"`
+	ID                int    `json:"id" form:"id"`
 }
 
 type FavsResults struct {
