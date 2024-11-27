@@ -173,6 +173,27 @@ func (a *API) GetReservationsPerUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationesFromService)
 }
 
+func (a *API) GetAllReservationsPerFieldOwner(c echo.Context) error {
+	ctx := c.Request().Context()
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+	id_user, ok1 := claims["id"].(float64)
+	if ok1 != true {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+
+	reservationesForOwner, err := a.reservationService.GetAllReservationsPerFieldOwner(ctx, idUser)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, reservationesForOwner)
+}
+
 func getUserIdAndRole(c echo.Context) (int, string, error) {
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")

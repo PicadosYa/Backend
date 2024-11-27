@@ -11,7 +11,7 @@ import (
 )
 
 type FieldService interface {
-	SaveField(ctx context.Context, field *models.Field) error
+	SaveField(ctx context.Context, field *models.FieldWithID_User) error
 	GetField(ctx context.Context, id int, month time.Time) (*models.Field, error)
 	GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error)
 	UpdateField(ctx context.Context, field *models.Field) error
@@ -29,7 +29,7 @@ func NewFieldService(repo repository.IFieldRepository) FieldService {
 	}
 }
 
-func (s *fieldService) SaveField(ctx context.Context, field *models.Field) error {
+func (s *fieldService) SaveField(ctx context.Context, field *models.FieldWithID_User) error {
 	log.Println("Saving field")
 	return s.repo.SaveField(ctx, field)
 }

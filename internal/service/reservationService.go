@@ -15,6 +15,7 @@ type ReservationService interface {
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
+	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationService struct {
@@ -55,4 +56,8 @@ func (s *reservationService) UpdateReservation(ctx context.Context, reservation 
 
 func (s *reservationService) DeleteReservation(ctx context.Context, id int) error {
 	return s.repo.DeleteReservation(ctx, id)
+}
+
+func (s *reservationService) GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
+	return s.repo.GetAllReservationsPerFieldOwner(ctx, id)
 }

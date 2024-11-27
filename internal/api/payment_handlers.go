@@ -47,9 +47,9 @@ func (a *API) PaymentPrincipal(c echo.Context) error {
 			},
 		},
 		BackURLs: &preference.BackURLsRequest{
-			Success: "https://www.google.com.uy",
-			Failure: "https://www.youtube.com",
-			Pending: "https://www.elpais.com.uy",
+			Success: "http://localhost:3000/",
+			Failure: "http://localhost:3000/",
+			Pending: "http://localhost:3000/",
 		},
 		AutoReturn: "approved",
 		PaymentMethods: &preference.PaymentMethodsRequest{

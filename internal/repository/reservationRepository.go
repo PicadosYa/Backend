@@ -17,6 +17,7 @@ type IReservationRepository interface {
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
+	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationRepository struct {
@@ -62,6 +63,33 @@ func (r *reservationRepository) GetReservationsPerUser(ctx context.Context, id i
 	for rows.Next() {
 		var reservation models.Reservations_Result
 		err := rows.Scan(&reservation.EmailUser, &reservation.ReservationDate, &reservation.StartTime, &reservation.EndTime, &reservation.FieldName, &reservation.StatusReservation)
+		if err != nil {
+			return nil, err
+		}
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
+}
+
+func (r *reservationRepository) GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
+	qryGetAllReservationsPerFieldOwner := `CALL GetReservationsByOwner(?);`
+	rows, err := r.db.QueryContext(ctx, qryGetAllReservationsPerFieldOwner, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []models.Reservations_Field_Owner
+
+	for rows.Next() {
+		var reservation models.Reservations_Field_Owner
+		err := rows.Scan(&reservation.ID_Reserv, &reservation.User_Name, &reservation.Field_Name, &reservation.Date,
+			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
 		if err != nil {
 			return nil, err
 		}
