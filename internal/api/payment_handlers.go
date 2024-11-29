@@ -54,9 +54,9 @@ func (a *API) PaymentPrincipal(c echo.Context) error {
 			Email: reqBody.Email,
 		},
 		BackURLs: &preference.BackURLsRequest{
-			Success: "http://54.84.102.220//field/" + reqBody.ID,
-			Failure: "http://54.84.102.220//field/" + reqBody.ID,
-			Pending: "http://54.84.102.220//field/" + reqBody.ID,
+			Success: "http://54.84.102.220/field/" + reqBody.ID,
+			Failure: "http://54.84.102.220/field/" + reqBody.ID,
+			Pending: "http://54.84.102.220/field/" + reqBody.ID,
 		},
 		AutoReturn: "approved",
 		PaymentMethods: &preference.PaymentMethodsRequest{
