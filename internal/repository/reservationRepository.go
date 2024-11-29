@@ -30,7 +30,7 @@ func NewReservationRepository(db *sqlx.DB) IReservationRepository {
 }
 
 func (r *reservationRepository) SaveReservation(ctx context.Context, reservation *models.Reservation) error {
-	query := `CALL InsertReservation(?, ?, ?, ?, ?)`
+	query := `CALL InsertReservation(?, ?, ?, ?, ?, ?)`
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
@@ -39,6 +39,7 @@ func (r *reservationRepository) SaveReservation(ctx context.Context, reservation
 		reservation.Date,
 		reservation.StartTime,
 		reservation.EndTime,
+    reservation.PaymentID,
 	)
 	if err != nil {
 		log.Fatal("Error executing InsertReservation: ", err)
@@ -61,7 +62,7 @@ func (r *reservationRepository) GetReservationsPerUser(ctx context.Context, id i
 
 	for rows.Next() {
 		var reservation models.Reservations_Result
-		err := rows.Scan(&reservation.EmailUser, &reservation.ReservationDate, &reservation.StartTime, &reservation.EndTime, &reservation.FieldName, &reservation.StatusReservation)
+		err := rows.Scan(&reservation.EmailUser, &reservation.ReservationDate, &reservation.StartTime, &reservation.EndTime, &reservation.FieldName, &reservation.StatusReservation, &reservation.PaymentID)
 		if err != nil {
 			return nil, err
 		}

@@ -60,14 +60,14 @@ func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.U
 		return nil, ErrInvalidCredentials
 	}
 	return &models.User{
-		ID:         u.ID,
-		FirstName:  u.FirstName,
-		LastName:   u.LastName,
-		Email:      u.Email,
-		Phone:      u.Phone,
-    ProfilePictureUrl:  u.ProfilePictureUrl,
-		Role:       entity.UserRole(u.Role),
-		IsVerified: u.IsVerified,
+		ID:                u.ID,
+		FirstName:         u.FirstName,
+		LastName:          u.LastName,
+		Email:             u.Email,
+		Phone:             u.Phone,
+		ProfilePictureUrl: u.ProfilePictureUrl,
+		Role:              entity.UserRole(u.Role),
+		IsVerified:        u.IsVerified,
 	}, nil
 }
 
@@ -186,7 +186,7 @@ func sendEmail(templateID, email, token, name string) error {
 	return nil
 }
 
-func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, file *multipart.FileHeader, id int) (string, error) {
+func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, file *multipart.FileHeader, id int, profile_picture_url string) (string, error) {
 	var profilePictureURL string
 	var err error
 
@@ -199,6 +199,9 @@ func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email,
 	}
 
 	// Actualizar la información del usuario en el repositorio
+	if profile_picture_url != "" {
+		profilePictureURL = profile_picture_url
+	}
 	err = s.repo.UpdateUserProfileInfo(ctx, first_name, last_name, email, phone, position_player, team_name, age, profilePictureURL, id)
 	if err != nil {
 		return "", err
