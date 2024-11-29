@@ -38,6 +38,7 @@ func main() {
 			repository.New,
 			repository.NewFieldRepository,
 			repository.NewReservationRepository,
+			repository.NewCloudinary,
 			service.New,
 			service.NewFieldService,
 			service.NewReservationService,

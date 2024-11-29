@@ -46,6 +46,9 @@ func (r *fieldRepository) SaveField(ctx context.Context, field *models.FieldWith
 	if field.CreationDate.String() == "0001-01-01" {
 		field.CreationDate = strfmt.Date(time.Now())
 	}
+	if serviceIDsStr == "" {
+		serviceIDsStr = "1"
+	}
 
 	log.Println("Query: ", query)
 	log.Println("Type: ", field.Type)

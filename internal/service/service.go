@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"mime/multipart"
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
@@ -25,18 +26,20 @@ type Service interface {
 	VerifyRecoveryToken(ctx context.Context, email, token string) (bool, error)
 	DeleteRecoveryToken(ctx context.Context, email string) error
 	UpdateUserPassword(ctx context.Context, email string, hashedPassword string) error
-	UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, profile_picture_url string, id int) error
+	UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, file *multipart.FileHeader, id int) (string, error)
 	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 	CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error
 	GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error)
 }
 
 type serv struct {
-	repo repository.Repository
+	repo     repository.Repository
+	fileRepo repository.IFileRepository
 }
 
-func New(repo repository.Repository) Service {
+func New(repo repository.Repository, fileRepo repository.IFileRepository) Service {
 	return &serv{
-		repo: repo,
+		repo:     repo,
+		fileRepo: fileRepo,
 	}
 }
