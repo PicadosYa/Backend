@@ -70,3 +70,11 @@ type FieldWithID_User struct {
 	Reservations    []ReservationReduced `json:"reservations" db:"reservations" form:"reservations"`
 	ID_User         int                  `json:"user_id" db:"user_id"`
 }
+
+type FieldsResultsPerOwner struct {
+	Field_Name    string `json:"field_name"`
+	Field_Address string `json:"field_address"`
+	Field_Type    string `json:"field_type"`
+	Field_Phone   string `json:"field_phone"`
+	Field_Status  string `json:"field_status"`
+}

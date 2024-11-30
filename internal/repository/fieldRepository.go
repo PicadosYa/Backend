@@ -21,6 +21,7 @@ type IFieldRepository interface {
 	UpdateField(ctx context.Context, field *models.Field) error
 	PatchField(ctx context.Context, field *models.Field) error
 	RemoveField(ctx context.Context, id int) error
+	GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error)
 }
 
 type fieldRepository struct {
@@ -79,6 +80,32 @@ func (r *fieldRepository) SaveField(ctx context.Context, field *models.FieldWith
 	}
 
 	return nil
+}
+
+func (r *fieldRepository) GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error) {
+	query := `CALL GetFieldsByOwnerId(?)`
+	rows, err := r.db.QueryContext(ctx, query, id_user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var fields []models.FieldsResultsPerOwner
+
+	for rows.Next() {
+		var field models.FieldsResultsPerOwner
+		err := rows.Scan(&field.Field_Name, &field.Field_Address, &field.Field_Type, &field.Field_Phone, &field.Field_Status)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, field)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return fields, nil
 }
 
 func (r *fieldRepository) GetField(ctx context.Context, id int, month time.Time) (*models.Field, error) {

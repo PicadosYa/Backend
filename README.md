@@ -268,6 +268,27 @@ Sirve para insertar una nueva cancha: </br></br>
 
 `Response: 201`
 
+## `GET /api/fields/per-owner`
+Mandar token por authorization
+```JSON
+[
+    {
+        "field_name": "Field Name",
+        "field_address": "123 Example Street",
+        "field_type": "5",
+        "field_phone": "123-456-7890",
+        "field_status": "1"
+    },
+    {
+        "field_name": "Field Name",
+        "field_address": "123 Example Street",
+        "field_type": "5",
+        "field_phone": "123-456-7890",
+        "field_status": "1"
+    }
+]
+```
+
 ## `UPDATE /api/fields/:id`
 Mismo Body que Save
 

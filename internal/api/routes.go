@@ -33,6 +33,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	fields.PUT("/:id", a.UpdateField)
 	fields.PATCH("/:id", a.PatchField)
 	fields.DELETE("/:id", a.RemoveField)
+	fields.GET("/per-owner", a.GetFieldsPerOwner)
 
 	// ###################
 	// Reservations Endpoints

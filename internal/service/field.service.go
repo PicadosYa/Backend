@@ -19,6 +19,7 @@ type FieldService interface {
 	UpdateField(ctx context.Context, field *models.Field) error
 	PatchField(ctx context.Context, field *models.Field) error
 	RemoveField(ctx context.Context, id int) error
+	GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error)
 }
 
 type fieldService struct {
@@ -59,6 +60,10 @@ func (s *fieldService) GetField(ctx context.Context, id int, month time.Time) (*
 
 func (s *fieldService) GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error) {
 	return s.repo.GetFields(ctx, month, limit, offset)
+}
+
+func (s *fieldService) GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error) {
+	return s.repo.GetFieldsPerOwner(ctx, id_user)
 }
 
 func (s *fieldService) UpdateField(ctx context.Context, field *models.Field) error {
