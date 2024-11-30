@@ -277,14 +277,14 @@ Mandar token por authorization
         "field_address": "123 Example Street",
         "field_type": "5",
         "field_phone": "123-456-7890",
-        "field_status": "1"
+        "field_status": true
     },
     {
         "field_name": "Field Name",
         "field_address": "123 Example Street",
         "field_type": "5",
         "field_phone": "123-456-7890",
-        "field_status": "1"
+        "field_status": true
     }
 ]
 ```
