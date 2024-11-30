@@ -322,7 +322,7 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Error processing profile picture"})
 	}
 
-	var profilePictureURL string
+	//var profilePictureURL string
 	if file != nil {
 		// Si se proporcionó un archivo, subirlo
 		src, err := file.Open()
@@ -332,8 +332,8 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		defer src.Close()
 
 		// Llamar al servicio con el archivo
-		profilePictureURL, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
-			params.Phone, params.PositionPlayer, params.TeamName, params.Age, file, params.ID)
+		_, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
+			params.Phone, params.PositionPlayer, params.TeamName, params.Age, file, params.ID, "")
 		if err != nil {
 			if err == service.ErrUserAlreadyExists {
 				return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
@@ -343,8 +343,8 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		}
 	} else {
 		// Si no se proporcionó archivo, llamar al servicio sin archivo
-		profilePictureURL, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
-			params.Phone, params.PositionPlayer, params.TeamName, params.Age, nil, params.ID)
+		_, err = a.serv.UpdateUserInfo(ctx, params.FirstName, params.LastName, params.Email,
+			params.Phone, params.PositionPlayer, params.TeamName, params.Age, nil, params.ID, params.ProfilePictureUrl)
 		if err != nil {
 			if err == service.ErrUserAlreadyExists {
 				return c.JSON(http.StatusConflict, responseMessage{Message: "user already exists"})
@@ -354,21 +354,25 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		}
 	}
 
-  token, err := encryption.SignedLoginToken(&models.User{
-		ID:                int64(params.ID),
-		FirstName:         params.FirstName,
-		LastName:          params.LastName,
-		Email:             params.Email,
-		Phone:             params.Phone,
-		PositionPlayer:    params.PositionPlayer,
-		Age:               params.Age,
-		ProfilePictureUrl: profilePictureURL,    
-  })
+	user, err := a.serv.GetUserByID(ctx, int(params.ID))
 
-  if err != nil {
+	token, err := encryption.SignedLoginToken(&models.User{
+		ID:                user.ID,
+		FirstName:         user.FirstName,
+		LastName:          user.LastName,
+		Email:             user.Email,
+		Phone:             user.Phone,
+		ProfilePictureUrl: user.ProfilePictureUrl,
+		Role:              user.Role,
+		PositionPlayer:    user.PositionPlayer,
+		Age:               user.Age,
+		IsVerified:        user.IsVerified,
+	})
+
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "token error"})
 	}
 	return c.JSON(http.StatusOK, map[string]string{
-    token: token,
-  })
+		"token": token,
+	})
 }

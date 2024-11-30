@@ -88,17 +88,18 @@ func (a *API) CreateReservation(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid date format"})
 	}
-	reservation_to_register := models.Reservation{
+	reservationToRegister := models.Reservation{
 		FieldID:   reservation.FieldID,
 		UserID:    id_user,
 		Date:      parsedDate,
 		StartTime: reservation.StartTime,
 		EndTime:   reservation.EndTime,
+		PaymentID: reservation.PaymentID,
 	}
 	if role_user != "client" {
 		return c.JSON(http.StatusUnauthorized, responseError{Message: "No estás logueado como usuario"})
 	}
-	if err := a.reservationService.CreateReservation(ctx, &reservation_to_register); err != nil {
+	if err := a.reservationService.CreateReservation(ctx, &reservationToRegister); err != nil {
 		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	return c.JSON(http.StatusCreated, reservation)

@@ -13,7 +13,7 @@ import (
 )
 
 type FieldService interface {
-	SaveField(ctx context.Context, field *models.FieldWithID_User, files *map[string][]*multipart.FileHeader) error
+	SaveField(ctx context.Context, field *models.Field, files *map[string][]*multipart.FileHeader) error
 	GetField(ctx context.Context, id int, month time.Time) (*models.Field, error)
 	GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error)
 	UpdateField(ctx context.Context, field *models.Field) error
@@ -34,7 +34,7 @@ func NewFieldService(repo repository.IFieldRepository, fileRepo repository.IFile
 	}
 }
 
-func (s *fieldService) SaveField(ctx context.Context, field *models.FieldWithID_User, files *map[string][]*multipart.FileHeader) error {
+func (s *fieldService) SaveField(ctx context.Context, field *models.Field, files *map[string][]*multipart.FileHeader) error {
 	log.Println("Saving field")
 	log.Printf("Files: %v", files)
 	for key, fileHeaders := range *files {

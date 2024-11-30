@@ -15,7 +15,7 @@ import (
 )
 
 type IFieldRepository interface {
-	SaveField(ctx context.Context, field *models.FieldWithID_User) error
+	SaveField(ctx context.Context, field *models.Field) error
 	GetField(ctx context.Context, id int, month time.Time) (*models.Field, error)
 	GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error)
 	UpdateField(ctx context.Context, field *models.Field) error
@@ -34,8 +34,8 @@ func NewFieldRepository(db *sqlx.DB) IFieldRepository {
 	}
 }
 
-func (r *fieldRepository) SaveField(ctx context.Context, field *models.FieldWithID_User) error {
-	query := `CALL InsertField(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+func (r *fieldRepository) SaveField(ctx context.Context, field *models.Field) error {
+	query := `CALL InsertField(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	photoURLsStr := strings.Join(field.Photos, ",")
 	availableDaysStr := strings.Join(field.AvailableDays, ",")
 	serviceIDsStr := utils.SliceToString(field.Services)
@@ -57,7 +57,6 @@ func (r *fieldRepository) SaveField(ctx context.Context, field *models.FieldWith
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		field.ID_User,
 		field.Name,
 		field.Address,
 		field.Neighborhood,
@@ -81,7 +80,6 @@ func (r *fieldRepository) SaveField(ctx context.Context, field *models.FieldWith
 
 	return nil
 }
-
 func (r *fieldRepository) GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error) {
 	query := `CALL GetFieldsByOwnerId(?)`
 	rows, err := r.db.QueryContext(ctx, query, id_user)

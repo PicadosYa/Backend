@@ -289,6 +289,8 @@ Mandar token por authorization
 ]
 ```
 
+Te devuelve un ```Response 200```
+
 ## `UPDATE /api/fields/:id`
 Mismo Body que Save
 

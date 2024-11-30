@@ -7,6 +7,7 @@ type Reservation_without_id struct {
 	Date      string `json:"date" db:"date"`
 	StartTime string `json:"start_time" db:"start_time"`
 	EndTime   string `json:"end_time" db:"end_time"`
+	PaymentID int    `json:"payment_id" db:"payment_id"`
 }
 
 type Reservation struct {
@@ -15,6 +16,7 @@ type Reservation struct {
 	Date      time.Time `json:"date" db:"date"`
 	StartTime string    `json:"start_time" db:"start_time"`
 	EndTime   string    `json:"end_time" db:"end_time"`
+	PaymentID int       `json:"payment_id" db:"payment_id"`
 }
 
 type Reservations_Result struct {
@@ -24,6 +26,7 @@ type Reservations_Result struct {
 	EndTime           string
 	FieldName         string
 	StatusReservation string
+  PaymentID         int
 }
 
 type Reservations_Field_Owner struct {

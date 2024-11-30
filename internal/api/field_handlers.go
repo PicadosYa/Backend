@@ -86,17 +86,6 @@ func (a *API) GetField(c echo.Context) error {
 
 func (a *API) CreateField(c echo.Context) error {
 	ctx := c.Request().Context()
-	tokenStr := c.Request().Header.Get("Authorization")
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	claims, err := encryption.ParseLoginJWT(tokenStr)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
-	}
-	id_user, ok1 := claims["id"].(float64)
-	if ok1 != true {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
-	}
-	idUser := int(id_user)
 	formFiles, err := c.MultipartForm()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
@@ -110,34 +99,12 @@ func (a *API) CreateField(c echo.Context) error {
 	if err := c.Bind(field); err != nil {
 		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
 	}
-
-	fieldNew := models.FieldWithID_User{
-		Id:              field.Id,
-		Name:            field.Name,
-		Address:         field.Address,
-		Neighborhood:    field.Neighborhood,
-		Phone:           field.Phone,
-		Latitude:        field.Latitude,
-		Longitude:       field.Longitude,
-		Type:            field.Type,
-		Price:           field.Price,
-		Description:     field.Description,
-		LogoUrl:         field.LogoUrl,
-		AverageRating:   field.AverageRating,
-		Services:        field.Services,
-		CreationDate:    field.CreationDate,
-		Photos:          field.Photos,
-		AvailableDays:   field.AvailableDays,
-		UnvailableDates: field.UnvailableDates,
-		Reservations:    field.Reservations,
-		ID_User:         idUser,
-	}
 	log.Println("Bind data successful")
 	if err := a.dataValidator.Struct(field); err != nil {
 		return c.JSON(http.StatusBadRequest, responseError{Message: "Invalid request", Error: err.Error()})
 	}
 	log.Println("Validation successful")
-	if err := a.fieldService.SaveField(ctx, &fieldNew, &files); err != nil {
+	if err := a.fieldService.SaveField(ctx, field, &files); err != nil {
 		return c.JSON(http.StatusInternalServerError, responseError{Message: "Internal server error", Error: err.Error()})
 	}
 	log.Println("Save field successful")

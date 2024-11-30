@@ -24,9 +24,12 @@ func (a *API) PaymentPrincipal(c echo.Context) error {
 
 	// Estructura para recibir los datos de la solicitud
 	var reqBody struct {
+		ID       string  `json:"id"`
 		Title    string  `json:"title"`
 		Quantity int     `json:"quantity"`
 		Price    float64 `json:"price"`
+		Email    string  `json:"email"`
+		UserID   string  `json:"user_id"`
 	}
 
 	// Parsear el cuerpo de la solicitud
@@ -40,16 +43,20 @@ func (a *API) PaymentPrincipal(c echo.Context) error {
 	preferenceRequest := preference.Request{
 		Items: []preference.ItemRequest{
 			{
+				ID:         reqBody.ID,
 				Title:      reqBody.Title,
 				Quantity:   reqBody.Quantity,
 				UnitPrice:  reqBody.Price,
 				CurrencyID: "UYU",
 			},
 		},
+		Payer: &preference.PayerRequest{
+			Email: reqBody.Email,
+		},
 		BackURLs: &preference.BackURLsRequest{
-			Success: "http://localhost:3000/",
-			Failure: "http://localhost:3000/",
-			Pending: "http://localhost:3000/",
+			Success: "http://54.84.102.220/field/" + reqBody.ID,
+			Failure: "http://54.84.102.220/field/" + reqBody.ID,
+			Pending: "http://54.84.102.220/field/" + reqBody.ID,
 		},
 		AutoReturn: "approved",
 		PaymentMethods: &preference.PaymentMethodsRequest{
