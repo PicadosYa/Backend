@@ -76,5 +76,5 @@ type FieldsResultsPerOwner struct {
 	Field_Address string `json:"field_address"`
 	Field_Type    string `json:"field_type"`
 	Field_Phone   string `json:"field_phone"`
-	Field_Status  string `json:"field_status"`
+	Field_Status  bool   `json:"field_status"`
 }
