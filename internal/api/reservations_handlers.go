@@ -288,8 +288,6 @@ func (a *API) GetAllReservationsPerMonthCSV(c echo.Context) error {
 	return nil
 }
 
-// deaaaaa
-
 func (a *API) GetAllReservationsPerHour(c echo.Context) error {
 	ctx := c.Request().Context()
 	hour, err := strconv.Atoi(c.Param("id"))
@@ -338,7 +336,7 @@ func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
 	idUser := int(id_user)
 
 	// Obtener las reservas
-	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
+	reservationsPerHour, err := a.reservationService.GetAllReservationsPerHour(ctx, idUser, month)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
@@ -351,7 +349,7 @@ func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
 	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
 
 	// Escribir las reservas en el CSV
-	for _, reservation := range reservationsPerMonth {
+	for _, reservation := range reservationsPerHour {
 		writer.Write([]string{
 			reservation.User_Name,
 			reservation.Field_Name,

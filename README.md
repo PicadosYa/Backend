@@ -553,6 +553,103 @@ aunque le pagues
 
 `Response: 201`
 
+## `GET /reservations/reservations-per-owner/by-month/csv/:id`
+En el ID hay que mandarle desde que mes empezar a contar hasta lo actual, ejemplo, le mando 3, eso quiere decir que va a ser desde 3 meses atrás hasta ahora, empieza por el 1 significa que agarra solo lo del mes pasado y este. Va a devolver esto, pero en realidad este endpoint es exclusivamente para descargar el .csv.
+```JSON
+UserName,FieldName,Date,StartTime,EndTime,Type,Phone,Status
+dea 123,Sample Field Name,2024-12-01,10:00:00,12:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-12-02,14:00:00,16:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-11-02,14:00:00,16:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-10-02,14:00:00,16:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-10-02,15:00:00,16:00:00,5,123-456-7890,reserved
+```
+`Response: 200`
+## `GET /reservations/reservations-per-owner/by-month/:id`
+
+```JSON
+[
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-01",
+        "start_time": "10:00:00",
+        "end_time": "12:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-02",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-11-02",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    }
+]
+```
+`Response: 200`
+
+## `GET /reservations/reservations-per-owner/by-hour/csv/:id`
+Endpoint exclusivo para csv
+En este caso en :id puse 14, me trajo solo los de start_time 14
+```JSON
+UserName,FieldName,Date,StartTime,EndTime,Type,Phone,Status
+dea 123,Sample Field Name,2024-12-02,14:00:00,16:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-11-02,14:00:00,16:00:00,5,123-456-7890,reserved
+dea 123,Sample Field Name,2024-10-02,14:00:00,16:00:00,5,123-456-7890,reserved
+```
+
+`Response: 200`
+## `GET /reservations/reservations-per-owner/by-hour/:id`
+Obtener todas las reservations per user para esa hora.
+
+```JSON
+[
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-02",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-11-02",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-10-02",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    }
+]
+```
 ## `GET /reservations/reservations-per-user`
 No olvidarse de enviar el token por Authorization: Bearer {token}
 Devuelve un array con todas las reservas del usuario y su estado
