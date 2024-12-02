@@ -553,6 +553,35 @@ aunque le pagues
 
 `Response: 201`
 
+
+## `GET /reservations/reservations-per-owner`
+Obtiene todas las reservations por owner
+```JSON
+[
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-01T00:00:00Z",
+        "start_time": "10:00:00",
+        "end_time": "12:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-02T00:00:00Z",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    }
+]
+```
+`Response: 200`
+
 ## `GET /reservations/reservations-per-owner/by-month/export/:id?export=pdf`
 El id empieza por el 1 significa que agarra solo lo del mes pasado y este. Va a devolver esto, pero en realidad este endpoint es exclusivamente para descargar el csv o pdf, se puede cambiar luego del = del export dependiendo de lo que se quiera,
 ```JSON
