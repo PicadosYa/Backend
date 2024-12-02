@@ -39,6 +39,3 @@ type Reservations_Field_Owner struct {
 	Phone      string `json:"phone"`
 	Status     string `json:"status"`
 }
-
-type Reservations_Field_Owner_JSON struct {
-}

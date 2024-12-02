@@ -553,8 +553,8 @@ aunque le pagues
 
 `Response: 201`
 
-## `GET /reservations/reservations-per-owner/by-month/csv/:id`
-En el ID hay que mandarle desde que mes empezar a contar hasta lo actual, ejemplo, le mando 3, eso quiere decir que va a ser desde 3 meses atrás hasta ahora, empieza por el 1 significa que agarra solo lo del mes pasado y este. Va a devolver esto, pero en realidad este endpoint es exclusivamente para descargar el .csv.
+## `GET /reservations/reservations-per-owner/by-month/export/:id?export=pdf`
+El id empieza por el 1 significa que agarra solo lo del mes pasado y este. Va a devolver esto, pero en realidad este endpoint es exclusivamente para descargar el csv o pdf, se puede cambiar luego del = del export dependiendo de lo que se quiera,
 ```JSON
 UserName,FieldName,Date,StartTime,EndTime,Type,Phone,Status
 dea 123,Sample Field Name,2024-12-01,10:00:00,12:00:00,5,123-456-7890,reserved
@@ -602,8 +602,8 @@ dea 123,Sample Field Name,2024-10-02,15:00:00,16:00:00,5,123-456-7890,reserved
 ```
 `Response: 200`
 
-## `GET /reservations/reservations-per-owner/by-hour/csv/:id`
-Endpoint exclusivo para csv
+## `GET /reservations/reservations-per-owner/by-hour/export/:id?export=pdf`
+Endpoint exclusivo para el csv o pdf, se puede cambiar luego del = del export dependiendo de lo que se quiera,
 En este caso en :id puse 14, me trajo solo los de start_time 14
 ```JSON
 UserName,FieldName,Date,StartTime,EndTime,Type,Phone,Status

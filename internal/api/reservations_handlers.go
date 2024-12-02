@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"encoding/csv"
 
+	"github.com/jung-kurt/gofpdf"
 	"github.com/labstack/echo/v4"
 )
 
@@ -224,16 +225,14 @@ func (a *API) GetAllReservationsPerMonth(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationsPerMonth)
 
 }
-func (a *API) GetAllReservationsPerMonthCSV(c echo.Context) error {
+func (a *API) GetAllReservationsPerMonthExport(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	// Validar y convertir el parámetro del mes
 	month, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
 	}
 
-	// Obtener y procesar el token de autorización
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 	claims, err := encryption.ParseLoginJWT(tokenStr)
@@ -247,20 +246,52 @@ func (a *API) GetAllReservationsPerMonthCSV(c echo.Context) error {
 	}
 	idUser := int(id_user)
 
-	// Obtener las reservas
 	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// Crear el buffer para almacenar el CSV
+	format := c.QueryParam("format")
+	if format == "pdf" {
+		pdf := gofpdf.New("P", "mm", "A4", "")
+		pdf.AddPage()
+		pdf.SetFont("Arial", "B", 12)
+		pdf.Cell(40, 10, "Reservations Per Month")
+
+		pdf.Ln(10)
+		headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
+		for _, header := range headers {
+			pdf.CellFormat(30, 10, header, "1", 0, "C", false, 0, "")
+		}
+		pdf.Ln(-1)
+
+		pdf.SetFont("Arial", "", 10)
+		for _, reservation := range reservationsPerMonth {
+			pdf.CellFormat(30, 10, reservation.User_Name, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Field_Name, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Date, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Start_Time, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.End_Time, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Type, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Phone, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Status, "1", 0, "C", false, 0, "")
+			pdf.Ln(-1)
+		}
+
+		c.Response().Header().Set("Content-Type", "application/pdf")
+		c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.pdf")
+		err := pdf.Output(c.Response().Writer)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to generate PDF"})
+		}
+		return nil
+	}
+
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
-	// Escribir los encabezados del CSV
 	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
 
-	// Escribir las reservas en el CSV
 	for _, reservation := range reservationsPerMonth {
 		writer.Write([]string{
 			reservation.User_Name,
@@ -275,11 +306,9 @@ func (a *API) GetAllReservationsPerMonthCSV(c echo.Context) error {
 	}
 	writer.Flush()
 
-	// Configurar las cabeceras HTTP
 	c.Response().Header().Set("Content-Type", "text/csv")
 	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
 
-	// Escribir el contenido del CSV en la respuesta HTTP
 	_, err = c.Response().Write(buf.Bytes())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
@@ -312,16 +341,14 @@ func (a *API) GetAllReservationsPerHour(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationsPerHour)
 
 }
-func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
+func (a *API) GetAllReservationsPerHourExport(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	// Validar y convertir el parámetro del mes
 	month, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
 	}
 
-	// Obtener y procesar el token de autorización
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 	claims, err := encryption.ParseLoginJWT(tokenStr)
@@ -335,20 +362,52 @@ func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
 	}
 	idUser := int(id_user)
 
-	// Obtener las reservas
 	reservationsPerHour, err := a.reservationService.GetAllReservationsPerHour(ctx, idUser, month)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// Crear el buffer para almacenar el CSV
+	format := c.QueryParam("format")
+	if format == "pdf" {
+		pdf := gofpdf.New("P", "mm", "A4", "")
+		pdf.AddPage()
+		pdf.SetFont("Arial", "B", 12)
+		pdf.Cell(40, 10, "Reservations Per Hour")
+
+		pdf.Ln(10)
+		headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
+		for _, header := range headers {
+			pdf.CellFormat(30, 10, header, "1", 0, "C", false, 0, "")
+		}
+		pdf.Ln(-1)
+
+		pdf.SetFont("Arial", "", 10)
+		for _, reservation := range reservationsPerHour {
+			pdf.CellFormat(30, 10, reservation.User_Name, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Field_Name, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Date, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Start_Time, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.End_Time, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Type, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Phone, "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 10, reservation.Status, "1", 0, "C", false, 0, "")
+			pdf.Ln(-1)
+		}
+
+		c.Response().Header().Set("Content-Type", "application/pdf")
+		c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.pdf")
+		err := pdf.Output(c.Response().Writer)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to generate PDF"})
+		}
+		return nil
+	}
+
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
-	// Escribir los encabezados del CSV
 	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
 
-	// Escribir las reservas en el CSV
 	for _, reservation := range reservationsPerHour {
 		writer.Write([]string{
 			reservation.User_Name,
@@ -363,11 +422,9 @@ func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
 	}
 	writer.Flush()
 
-	// Configurar las cabeceras HTTP
 	c.Response().Header().Set("Content-Type", "text/csv")
-	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_hour.csv")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
 
-	// Escribir el contenido del CSV en la respuesta HTTP
 	_, err = c.Response().Write(buf.Bytes())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
