@@ -92,11 +92,16 @@ func (r *reservationRepository) GetAllReservationsExport(ctx context.Context, id
 
 	for rows.Next() {
 		var reservation models.Reservations_Field_Owner
-		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &reservation.Date,
+		var date string // Usaremos una variable temporal para almacenar la fecha de la base de datos.
+
+		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &date,
 			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
 		if err != nil {
 			return nil, err
 		}
+
+		// Formateamos la fecha a "YYYY-MM-DD".
+		reservation.Date = date[:10]
 		reservations = append(reservations, reservation)
 	}
 

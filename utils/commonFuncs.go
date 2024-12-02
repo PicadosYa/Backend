@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
+	"picadosYa/encryption"
 	"picadosYa/internal/models"
 	"strconv"
 	"strings"
@@ -11,8 +13,18 @@ import (
 	//"text/template/parse"
 	"time"
 
+	"bytes"
+	"encoding/csv"
+
 	"github.com/go-openapi/strfmt"
+	"github.com/labstack/echo/v4"
+
+	"github.com/jung-kurt/gofpdf"
+	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
+
+const APIKEY = "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"
 
 func SliceToString(slice []models.Service) string {
 	strSlice := make([]string, len(slice))
@@ -133,4 +145,141 @@ func GenerateRandomDigits(n int) string {
 		result += strconv.Itoa(digit)
 	}
 	return result
+}
+
+// Sendgrid
+func SendEmail(templateID, email, token, name string) error {
+	message := mail.NewV3Mail()
+	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
+	message.SetFrom(from)
+	personalization := mail.NewPersonalization()
+	to := mail.NewEmail("picadosya", email)
+	personalization.AddTos(to)
+	personalization.SetDynamicTemplateData("name", name)
+	personalization.SetDynamicTemplateData("token", token)
+	personalization.SetDynamicTemplateData("email", email)
+	message.AddPersonalizations(personalization)
+	message.SetTemplateID(templateID)
+	client := sendgrid.NewSendClient(APIKEY)
+	response, err := client.Send(message)
+	if err != nil {
+		return err
+	}
+	if response.StatusCode != 202 {
+		return fmt.Errorf("failed to send email, status code: %d", response.StatusCode)
+	}
+	return nil
+}
+
+// Cosas de echo
+func GenerateUserID(c echo.Context) int {
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return 0
+	}
+	id_user, ok1 := claims["id"].(float64)
+	if ok1 != true {
+		return 0
+	}
+	idUser := int(id_user)
+	return idUser
+}
+
+func GetUserIdAndRole(c echo.Context) (int, string, error) {
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return 0, "", err
+	}
+
+	id_user, ok1 := claims["id"].(float64)
+	role_user, ok2 := claims["role"].(string)
+	fmt.Println(claims)
+	if !ok1 || !ok2 {
+		return 0, "", fmt.Errorf("invalid token claims format")
+	}
+
+	idUser := int(id_user)
+	return idUser, role_user, nil
+}
+
+func GeneratePDF(c echo.Context, reservations []models.Reservations_Field_Owner) error {
+	pdf := gofpdf.New("L", "mm", "A4", "") // L = Landscape
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 12)
+
+	// Título
+	pdf.CellFormat(0, 10, "Reservations Export", "", 1, "C", false, 0, "")
+
+	// Encabezados
+	headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
+	columnWidths := []float64{40, 40, 30, 25, 25, 30, 40, 25} // Ajustar anchos para que se vean todas las columnas
+
+	for i, header := range headers {
+		pdf.CellFormat(columnWidths[i], 10, header, "1", 0, "C", true, 0, "")
+	}
+	pdf.Ln(-1)
+
+	// Datos
+	pdf.SetFont("Arial", "", 10)
+	for _, reservation := range reservations {
+		row := []string{
+			reservation.User_Name,
+			reservation.Field_Name,
+			reservation.Date,
+			reservation.Start_Time,
+			reservation.End_Time,
+			reservation.Type,
+			reservation.Phone,
+			reservation.Status,
+		}
+
+		for i, cell := range row {
+			pdf.CellFormat(columnWidths[i], 10, cell, "1", 0, "C", false, 0, "")
+		}
+		pdf.Ln(-1)
+	}
+
+	// Configurar la respuesta como PDF
+	c.Response().Header().Set("Content-Type", "application/pdf")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_export.pdf")
+	err := pdf.Output(c.Response().Writer)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to generate PDF")
+	}
+
+	return nil
+}
+
+func GenerateCSV(c echo.Context, reservations []models.Reservations_Field_Owner) error {
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	// Encabezados
+	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
+
+	// Filas
+	for _, reservation := range reservations {
+		writer.Write([]string{
+			reservation.User_Name,
+			reservation.Field_Name,
+			reservation.Date,
+			reservation.Start_Time,
+			reservation.End_Time,
+			reservation.Type,
+			reservation.Phone,
+			reservation.Status,
+		})
+	}
+	writer.Flush()
+
+	// Configurar headers y enviar respuesta
+	c.Response().Header().Set("Content-Type", "text/csv")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
+	_, err := c.Response().Write(buf.Bytes())
+	return err
 }
