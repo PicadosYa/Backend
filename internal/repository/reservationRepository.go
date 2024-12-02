@@ -18,6 +18,8 @@ type IReservationRepository interface {
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
 	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationRepository struct {
@@ -40,7 +42,7 @@ func (r *reservationRepository) SaveReservation(ctx context.Context, reservation
 		reservation.Date,
 		reservation.StartTime,
 		reservation.EndTime,
-    reservation.PaymentID,
+		reservation.PaymentID,
 	)
 	if err != nil {
 		log.Fatal("Error executing InsertReservation: ", err)
@@ -89,11 +91,81 @@ func (r *reservationRepository) GetAllReservationsPerFieldOwner(ctx context.Cont
 
 	for rows.Next() {
 		var reservation models.Reservations_Field_Owner
-		err := rows.Scan(&reservation.ID_Reserv, &reservation.User_Name, &reservation.Field_Name, &reservation.Date,
+		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &reservation.Date,
 			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
 		if err != nil {
 			return nil, err
 		}
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
+}
+
+func (r *reservationRepository) GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error) {
+	qryGetAllReservationsPerFieldOwner := `CALL GetReservationsPerOwnerByMonth(?, ?);`
+	rows, err := r.db.QueryContext(ctx, qryGetAllReservationsPerFieldOwner, id, month)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []models.Reservations_Field_Owner
+
+	for rows.Next() {
+		var reservation models.Reservations_Field_Owner
+		var date string // Usaremos una variable temporal para almacenar la fecha de la base de datos.
+
+		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &date,
+			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
+		if err != nil {
+			return nil, err
+		}
+
+		// Formateamos la fecha a "YYYY-MM-DD".
+		reservation.Date = date[:10] // Aseguramos que solo tomamos los primeros 10 caracteres.
+
+		fmt.Println("reservations per month", reservation)
+
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
+}
+
+func (r *reservationRepository) GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error) {
+	qryGetAllReservationsPerFieldOwner := `CALL GetReservationsPerOwnerByHour(?, ?);`
+	rows, err := r.db.QueryContext(ctx, qryGetAllReservationsPerFieldOwner, id, hour)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []models.Reservations_Field_Owner
+
+	for rows.Next() {
+		var reservation models.Reservations_Field_Owner
+		var date string // Usaremos una variable temporal para almacenar la fecha de la base de datos.
+
+		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &date,
+			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
+		if err != nil {
+			return nil, err
+		}
+
+		// Formateamos la fecha a "YYYY-MM-DD".
+		reservation.Date = date[:10] // Aseguramos que solo tomamos los primeros 10 caracteres.
+
+		fmt.Println("reservations per hour", reservation)
+
 		reservations = append(reservations, reservation)
 	}
 

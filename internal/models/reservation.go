@@ -26,11 +26,10 @@ type Reservations_Result struct {
 	EndTime           string
 	FieldName         string
 	StatusReservation string
-  PaymentID         int
+	PaymentID         int
 }
 
 type Reservations_Field_Owner struct {
-	ID_Reserv  int    `json:"id_reserv"`
 	User_Name  string `json:"user_name"`
 	Field_Name string `json:"field_name"`
 	Date       string `json:"date"`
@@ -39,4 +38,7 @@ type Reservations_Field_Owner struct {
 	Type       string `json:"type"`
 	Phone      string `json:"phone"`
 	Status     string `json:"status"`
+}
+
+type Reservations_Field_Owner_JSON struct {
 }

@@ -9,6 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"bytes"
+	"encoding/csv"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -195,6 +198,185 @@ func (a *API) GetAllReservationsPerFieldOwner(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationesForOwner)
 }
 
+func (a *API) GetAllReservationsPerMonth(c echo.Context) error {
+	ctx := c.Request().Context()
+	monthParam := c.Param("id")
+	month, err := strconv.Atoi(monthParam)
+	if err != nil || month < 1 || month > 12 {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month"})
+	}
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+	id_user, ok1 := claims["id"].(float64)
+	if ok1 != true {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	fmt.Println(reservationsPerMonth)
+	return c.JSON(http.StatusOK, reservationsPerMonth)
+
+}
+func (a *API) GetAllReservationsPerMonthCSV(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	// Validar y convertir el parámetro del mes
+	month, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+	}
+
+	// Obtener y procesar el token de autorización
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+
+	id_user, ok1 := claims["id"].(float64)
+	if !ok1 {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+
+	// Obtener las reservas
+	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	// Crear el buffer para almacenar el CSV
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	// Escribir los encabezados del CSV
+	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
+
+	// Escribir las reservas en el CSV
+	for _, reservation := range reservationsPerMonth {
+		writer.Write([]string{
+			reservation.User_Name,
+			reservation.Field_Name,
+			reservation.Date,
+			reservation.Start_Time,
+			reservation.End_Time,
+			reservation.Type,
+			reservation.Phone,
+			reservation.Status,
+		})
+	}
+	writer.Flush()
+
+	// Configurar las cabeceras HTTP
+	c.Response().Header().Set("Content-Type", "text/csv")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
+
+	// Escribir el contenido del CSV en la respuesta HTTP
+	_, err = c.Response().Write(buf.Bytes())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
+	}
+
+	return nil
+}
+
+// deaaaaa
+
+func (a *API) GetAllReservationsPerHour(c echo.Context) error {
+	ctx := c.Request().Context()
+	hour, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+	}
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+	id_user, ok1 := claims["id"].(float64)
+	if ok1 != true {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+	reservationsPerHour, err := a.reservationService.GetAllReservationsPerHour(ctx, idUser, hour)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, reservationsPerHour)
+
+}
+func (a *API) GetAllReservationsPerHourCSV(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	// Validar y convertir el parámetro del mes
+	month, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
+	}
+
+	// Obtener y procesar el token de autorización
+	tokenStr := c.Request().Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	claims, err := encryption.ParseLoginJWT(tokenStr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
+	}
+
+	id_user, ok1 := claims["id"].(float64)
+	if !ok1 {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	}
+	idUser := int(id_user)
+
+	// Obtener las reservas
+	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	// Crear el buffer para almacenar el CSV
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	// Escribir los encabezados del CSV
+	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
+
+	// Escribir las reservas en el CSV
+	for _, reservation := range reservationsPerMonth {
+		writer.Write([]string{
+			reservation.User_Name,
+			reservation.Field_Name,
+			reservation.Date,
+			reservation.Start_Time,
+			reservation.End_Time,
+			reservation.Type,
+			reservation.Phone,
+			reservation.Status,
+		})
+	}
+	writer.Flush()
+
+	// Configurar las cabeceras HTTP
+	c.Response().Header().Set("Content-Type", "text/csv")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_hour.csv")
+
+	// Escribir el contenido del CSV en la respuesta HTTP
+	_, err = c.Response().Write(buf.Bytes())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
+	}
+
+	return nil
+}
 func getUserIdAndRole(c echo.Context) (int, string, error) {
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")

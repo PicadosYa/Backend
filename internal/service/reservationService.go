@@ -16,6 +16,8 @@ type ReservationService interface {
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
 	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationService struct {
@@ -60,4 +62,11 @@ func (s *reservationService) DeleteReservation(ctx context.Context, id int) erro
 
 func (s *reservationService) GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
 	return s.repo.GetAllReservationsPerFieldOwner(ctx, id)
+}
+func (s *reservationService) GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error) {
+	return s.repo.GetAllReservationsPerMonth(ctx, id, month)
+}
+
+func (s *reservationService) GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error) {
+	return s.repo.GetAllReservationsPerHour(ctx, id, hour)
 }

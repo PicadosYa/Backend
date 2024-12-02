@@ -46,6 +46,10 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	reservations.DELETE("/:id", a.DeleteReservation)
 	reservations.GET("/reservations-per-user", a.GetReservationsPerUser)
 	reservations.GET("/reservations-per-owner", a.GetAllReservationsPerFieldOwner)
+	reservations.GET("/reservations-per-owner/by-month/:id", a.GetAllReservationsPerMonth)
+	reservations.GET("/reservations-per-owner/by-month/csv/:id", a.GetAllReservationsPerMonthCSV)
+	reservations.GET("/reservations-per-owner/by-hour/:id", a.GetAllReservationsPerHour)
+	reservations.GET("/reservations-per-owner/by-hour/csv/:id", a.GetAllReservationsPerHourCSV)
 
 	// ###################
 	// Payment Endpoints
