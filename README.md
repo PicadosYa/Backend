@@ -553,6 +553,34 @@ aunque le pagues
 
 `Response: 201`
 
+## `GET /reservations/reservations-per-owner`
+Obtiene todas las reservations por owner
+```JSON
+[
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-01T00:00:00Z",
+        "start_time": "10:00:00",
+        "end_time": "12:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    },
+    {
+        "user_name": "dea 123",
+        "field_name": "Sample Field Name",
+        "date": "2024-12-02T00:00:00Z",
+        "start_time": "14:00:00",
+        "end_time": "16:00:00",
+        "type": "5",
+        "phone": "123-456-7890",
+        "status": "reserved"
+    }
+]
+```
+`Response: 200`
+
 ## `GET /reservations/reservations-per-owner/by-month/csv/:id`
 En el ID hay que mandarle desde que mes empezar a contar hasta lo actual, ejemplo, le mando 3, eso quiere decir que va a ser desde 3 meses atrás hasta ahora, empieza por el 1 significa que agarra solo lo del mes pasado y este. Va a devolver esto, pero en realidad este endpoint es exclusivamente para descargar el .csv.
 ```JSON
