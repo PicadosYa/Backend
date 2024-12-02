@@ -199,39 +199,8 @@ func (a *API) GetAllReservationsPerOwner(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationesForOwner)
 }
 
-func (a *API) GetAllReservationsPerMonth(c echo.Context) error {
+func (a *API) GetReservationsPerOwnerExport(c echo.Context) error {
 	ctx := c.Request().Context()
-	monthParam := c.Param("id")
-	month, err := strconv.Atoi(monthParam)
-	if err != nil || month < 1 || month > 12 {
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid month"})
-	}
-	tokenStr := c.Request().Header.Get("Authorization")
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	claims, err := encryption.ParseLoginJWT(tokenStr)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
-	}
-	id_user, ok1 := claims["id"].(float64)
-	if ok1 != true {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
-	}
-	idUser := int(id_user)
-	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-	fmt.Println(reservationsPerMonth)
-	return c.JSON(http.StatusOK, reservationsPerMonth)
-
-}
-func (a *API) GetAllReservationsPerMonthExport(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	month, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
-	}
 
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
@@ -240,59 +209,84 @@ func (a *API) GetAllReservationsPerMonthExport(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
 	}
 
-	id_user, ok1 := claims["id"].(float64)
-	if !ok1 {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
+	monthsAgoParam := c.QueryParam("MonthsAgo")
+	hourParam := c.QueryParam("Hour")
+
+	monthsAgo, err := strconv.Atoi(monthsAgoParam)
+	if err != nil {
+		monthsAgo = 123
+	}
+
+	hour, err := strconv.Atoi(hourParam)
+	if err != nil {
+		hour = 123
+	}
+
+	id_user, ok := claims["id"].(float64)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Invalid user ID"})
 	}
 	idUser := int(id_user)
 
-	reservationsPerMonth, err := a.reservationService.GetAllReservationsPerMonth(ctx, idUser, month)
+	reservationsExport, err := a.reservationService.GetAllReservationsExport(ctx, idUser, monthsAgo, hour)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, responseMessage{Message: err.Error()})
 	}
 
 	format := c.QueryParam("format")
-	if format == "pdf" {
-		pdf := gofpdf.New("P", "mm", "A4", "")
-		pdf.AddPage()
-		pdf.SetFont("Arial", "B", 12)
-		pdf.Cell(40, 10, "Reservations Per Month")
+	switch format {
+	case "pdf":
+		return generatePDF(c, reservationsExport)
+	case "csv":
+		return generateCSV(c, reservationsExport)
+	default:
+		return c.JSON(http.StatusOK, reservationsExport)
+	}
+}
 
-		pdf.Ln(10)
-		headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
-		for _, header := range headers {
-			pdf.CellFormat(30, 10, header, "1", 0, "C", false, 0, "")
-		}
+func generatePDF(c echo.Context, reservations []models.Reservations_Field_Owner) error {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 12)
+	pdf.Cell(40, 10, "Reservations Per Month")
+	pdf.Ln(10)
+
+	// Encabezados
+	headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
+	for _, header := range headers {
+		pdf.CellFormat(30, 10, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(-1)
+
+	// Filas
+	pdf.SetFont("Arial", "", 10)
+	for _, reservation := range reservations {
+		pdf.CellFormat(30, 10, reservation.User_Name, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Field_Name, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Date, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Start_Time, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.End_Time, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Type, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Phone, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 10, reservation.Status, "1", 0, "C", false, 0, "")
 		pdf.Ln(-1)
-
-		pdf.SetFont("Arial", "", 10)
-		for _, reservation := range reservationsPerMonth {
-			pdf.CellFormat(30, 10, reservation.User_Name, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Field_Name, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Date, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Start_Time, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.End_Time, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Type, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Phone, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Status, "1", 0, "C", false, 0, "")
-			pdf.Ln(-1)
-		}
-
-		c.Response().Header().Set("Content-Type", "application/pdf")
-		c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.pdf")
-		err := pdf.Output(c.Response().Writer)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to generate PDF"})
-		}
-		return nil
 	}
 
+	// Configurar headers y enviar respuesta
+	c.Response().Header().Set("Content-Type", "application/pdf")
+	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.pdf")
+	return pdf.Output(c.Response().Writer)
+}
+
+func generateCSV(c echo.Context, reservations []models.Reservations_Field_Owner) error {
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
+	// Encabezados
 	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
 
-	for _, reservation := range reservationsPerMonth {
+	// Filas
+	for _, reservation := range reservations {
 		writer.Write([]string{
 			reservation.User_Name,
 			reservation.Field_Name,
@@ -306,132 +300,13 @@ func (a *API) GetAllReservationsPerMonthExport(c echo.Context) error {
 	}
 	writer.Flush()
 
+	// Configurar headers y enviar respuesta
 	c.Response().Header().Set("Content-Type", "text/csv")
 	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
-
-	_, err = c.Response().Write(buf.Bytes())
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
-	}
-
-	return nil
+	_, err := c.Response().Write(buf.Bytes())
+	return err
 }
 
-func (a *API) GetAllReservationsPerHour(c echo.Context) error {
-	ctx := c.Request().Context()
-	hour, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
-	}
-	tokenStr := c.Request().Header.Get("Authorization")
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	claims, err := encryption.ParseLoginJWT(tokenStr)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
-	}
-	id_user, ok1 := claims["id"].(float64)
-	if ok1 != true {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
-	}
-	idUser := int(id_user)
-	reservationsPerHour, err := a.reservationService.GetAllReservationsPerHour(ctx, idUser, hour)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-	return c.JSON(http.StatusOK, reservationsPerHour)
-
-}
-func (a *API) GetAllReservationsPerHourExport(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	month, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responseMessage{Message: "Invalid ID format"})
-	}
-
-	tokenStr := c.Request().Header.Get("Authorization")
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	claims, err := encryption.ParseLoginJWT(tokenStr)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: err.Error()})
-	}
-
-	id_user, ok1 := claims["id"].(float64)
-	if !ok1 {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Check id_user"})
-	}
-	idUser := int(id_user)
-
-	reservationsPerHour, err := a.reservationService.GetAllReservationsPerHour(ctx, idUser, month)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-
-	format := c.QueryParam("format")
-	if format == "pdf" {
-		pdf := gofpdf.New("P", "mm", "A4", "")
-		pdf.AddPage()
-		pdf.SetFont("Arial", "B", 12)
-		pdf.Cell(40, 10, "Reservations Per Hour")
-
-		pdf.Ln(10)
-		headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
-		for _, header := range headers {
-			pdf.CellFormat(30, 10, header, "1", 0, "C", false, 0, "")
-		}
-		pdf.Ln(-1)
-
-		pdf.SetFont("Arial", "", 10)
-		for _, reservation := range reservationsPerHour {
-			pdf.CellFormat(30, 10, reservation.User_Name, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Field_Name, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Date, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Start_Time, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.End_Time, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Type, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Phone, "1", 0, "C", false, 0, "")
-			pdf.CellFormat(30, 10, reservation.Status, "1", 0, "C", false, 0, "")
-			pdf.Ln(-1)
-		}
-
-		c.Response().Header().Set("Content-Type", "application/pdf")
-		c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.pdf")
-		err := pdf.Output(c.Response().Writer)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to generate PDF"})
-		}
-		return nil
-	}
-
-	var buf bytes.Buffer
-	writer := csv.NewWriter(&buf)
-
-	writer.Write([]string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"})
-
-	for _, reservation := range reservationsPerHour {
-		writer.Write([]string{
-			reservation.User_Name,
-			reservation.Field_Name,
-			reservation.Date,
-			reservation.Start_Time,
-			reservation.End_Time,
-			reservation.Type,
-			reservation.Phone,
-			reservation.Status,
-		})
-	}
-	writer.Flush()
-
-	c.Response().Header().Set("Content-Type", "text/csv")
-	c.Response().Header().Set("Content-Disposition", "attachment;filename=reservations_per_month.csv")
-
-	_, err = c.Response().Write(buf.Bytes())
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responseMessage{Message: "Failed to write CSV"})
-	}
-
-	return nil
-}
 func getUserIdAndRole(c echo.Context) (int, string, error) {
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")

@@ -18,6 +18,7 @@ type ReservationService interface {
 	GetAllReservationsPerOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsExport(ctx context.Context, id, month, hour int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationService struct {
@@ -33,6 +34,16 @@ func NewReservationService(repo repository.IReservationRepository) ReservationSe
 func (s *reservationService) SaveReservation(ctx context.Context, reservation *models.Reservation) error {
 	log.Println("Saving reservation")
 	return s.repo.SaveReservation(ctx, reservation)
+}
+
+func (s *reservationService) GetAllReservationsExport(ctx context.Context, id, month, hour int) ([]models.Reservations_Field_Owner, error) {
+	if month == 123 {
+		return s.repo.GetAllReservationsPerHour(ctx, id, hour)
+	}
+	if hour == 123 {
+		return s.repo.GetAllReservationsPerMonth(ctx, id, month)
+	}
+	return s.repo.GetAllReservationsExport(ctx, id, month, hour)
 }
 
 func (s *reservationService) GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error) {
