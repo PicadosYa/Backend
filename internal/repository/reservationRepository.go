@@ -17,7 +17,7 @@ type IReservationRepository interface {
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
-	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error)
 }
@@ -79,7 +79,7 @@ func (r *reservationRepository) GetReservationsPerUser(ctx context.Context, id i
 	return reservations, nil
 }
 
-func (r *reservationRepository) GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
+func (r *reservationRepository) GetAllReservationsPerOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
 	qryGetAllReservationsPerFieldOwner := `CALL GetReservationsByOwner(?);`
 	rows, err := r.db.QueryContext(ctx, qryGetAllReservationsPerFieldOwner, id)
 	if err != nil {

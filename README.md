@@ -679,6 +679,9 @@ Obtener todas las reservations per user para esa hora.
     }
 ]
 ```
+
+
+
 ## `GET /reservations/reservations-per-user`
 No olvidarse de enviar el token por Authorization: Bearer {token}
 Devuelve un array con todas las reservas del usuario y su estado

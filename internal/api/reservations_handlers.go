@@ -178,7 +178,7 @@ func (a *API) GetReservationsPerUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, reservationesFromService)
 }
 
-func (a *API) GetAllReservationsPerFieldOwner(c echo.Context) error {
+func (a *API) GetAllReservationsPerOwner(c echo.Context) error {
 	ctx := c.Request().Context()
 	tokenStr := c.Request().Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
@@ -192,7 +192,7 @@ func (a *API) GetAllReservationsPerFieldOwner(c echo.Context) error {
 	}
 	idUser := int(id_user)
 
-	reservationesForOwner, err := a.reservationService.GetAllReservationsPerFieldOwner(ctx, idUser)
+	reservationesForOwner, err := a.reservationService.GetAllReservationsPerOwner(ctx, idUser)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
