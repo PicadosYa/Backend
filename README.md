@@ -231,6 +231,7 @@ Por defecto es siempre el mes actual
 
 ### Authentication
 - Requires Bearer Token in Authorization Header
+- Requires users with `field` role
 
 ### Request Parameters
 
