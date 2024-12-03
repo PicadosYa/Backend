@@ -101,7 +101,7 @@ func (a *API) CreateReservation(c echo.Context) error {
 	if err := a.reservationService.CreateReservation(ctx, &reservationToRegister); err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: "Internal server error", Error: err.Error()})
 	}
-	utils.SendEmail("d-1dc0f0686db042f08a10d5caa4b80612", userEmail.Email, canchaName.Field_Name, reservation.StartTime)
+	utils.SendEmail("d-1dc0f0686db042f08a10d5caa4b80612", userEmail.Email, canchaName.Field_Address, reservation.StartTime)
 	return c.JSON(http.StatusCreated, reservation)
 }
 
@@ -162,17 +162,6 @@ func (a *API) GetReservationsPerUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, reservationesFromService)
-}
-
-func (a *API) GetAllReservationsPerOwner(c echo.Context) error {
-	ctx := c.Request().Context()
-	idUser := utils.GenerateUserID(c)
-
-	reservationesForOwner, err := a.reservationService.GetAllReservationsPerOwner(ctx, idUser)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-	return c.JSON(http.StatusOK, reservationesForOwner)
 }
 
 func (a *API) GetReservationsPerOwnerExport(c echo.Context) error {
