@@ -1,6 +1,10 @@
 package api
 
 import (
+	"picadosYa/encryption"
+	"picadosYa/internal/entity"
+	"picadosYa/internal/middlewares"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,7 +33,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	fields := apiGroup.Group("/fields")
 	fields.GET("", a.GetFields)
 	fields.GET("/:id", a.GetField)
-	fields.POST("", a.CreateField)
+	fields.POST("", a.CreateField, middlewares.JWTMiddleware([]byte(encryption.Key)), middlewares.RequireRole(string(entity.RoleCancha)))
 	fields.PUT("/:id", a.UpdateField)
 	fields.PATCH("/:id", a.PatchField)
 	fields.DELETE("/:id", a.RemoveField)
