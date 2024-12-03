@@ -10,11 +10,10 @@ import (
 	"picadosYa/internal/api/dtos"
 	"picadosYa/internal/entity"
 	"picadosYa/internal/models"
+	"picadosYa/utils"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 var (
@@ -22,8 +21,6 @@ var (
 	ErrInvalidCredentials    = errors.New("invalid credentials")
 	ErrTokenInvalidOrExpired = errors.New("invalid or expired token")
 )
-
-const APIKEY = "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"
 
 func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, password, phone string, role entity.UserRole, accepted_terms bool) error {
 	u, _ := s.repo.GetUserByEmail(ctx, email)
@@ -96,7 +93,7 @@ func (s *serv) SendRecoveryEmail(email, token string) error {
 		return nil
 	}
 	templateID := "d-14d7497e32d745889c502d5bb3d7bdca"
-	return sendEmail(templateID, email, token, u.FirstName)
+	return utils.SendEmail(templateID, email, token, u.FirstName)
 }
 
 func (s *serv) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
@@ -148,7 +145,7 @@ func (s *serv) SendVerifyEmail(email, token string) error {
 		return nil
 	}
 	templateID := "d-b512ab2466914e5fb4315a7e0998506c"
-	return sendEmail(templateID, email, token, u.FirstName)
+	return utils.SendEmail(templateID, email, token, u.FirstName)
 }
 
 func (s *serv) GetUserByToken(ctx context.Context, token string) (*dtos.VerifyUserEmail, error) {
@@ -161,29 +158,6 @@ func (s *serv) GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsRes
 
 func (s *serv) UpdateUserVerification(ctx context.Context, email string) error {
 	return s.repo.UpdateUserVerification(ctx, email)
-}
-
-func sendEmail(templateID, email, token, name string) error {
-	message := mail.NewV3Mail()
-	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
-	message.SetFrom(from)
-	personalization := mail.NewPersonalization()
-	to := mail.NewEmail("picadosya", email)
-	personalization.AddTos(to)
-	personalization.SetDynamicTemplateData("name", name)
-	personalization.SetDynamicTemplateData("token", token)
-	personalization.SetDynamicTemplateData("email", email)
-	message.AddPersonalizations(personalization)
-	message.SetTemplateID(templateID)
-	client := sendgrid.NewSendClient(APIKEY)
-	response, err := client.Send(message)
-	if err != nil {
-		return err
-	}
-	if response.StatusCode != 202 {
-		return fmt.Errorf("failed to send email, status code: %d", response.StatusCode)
-	}
-	return nil
 }
 
 func (s *serv) UpdateUserInfo(ctx context.Context, first_name, last_name, email, phone, position_player, team_name string, age int, file *multipart.FileHeader, id int, profile_picture_url string) (string, error) {

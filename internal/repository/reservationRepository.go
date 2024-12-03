@@ -17,9 +17,10 @@ type IReservationRepository interface {
 	UpdateReservation(ctx context.Context, reservation *models.Reservation) error
 	DeleteReservation(ctx context.Context, id int) error
 	GetReservationsPerUser(ctx context.Context, id int) ([]models.Reservations_Result, error)
-	GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsPerOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerMonth(ctx context.Context, id, month int) ([]models.Reservations_Field_Owner, error)
 	GetAllReservationsPerHour(ctx context.Context, id, hour int) ([]models.Reservations_Field_Owner, error)
+	GetAllReservationsExport(ctx context.Context, id, month, hour int) ([]models.Reservations_Field_Owner, error)
 }
 
 type reservationRepository struct {
@@ -79,7 +80,39 @@ func (r *reservationRepository) GetReservationsPerUser(ctx context.Context, id i
 	return reservations, nil
 }
 
-func (r *reservationRepository) GetAllReservationsPerFieldOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
+func (r *reservationRepository) GetAllReservationsExport(ctx context.Context, id, month, hour int) ([]models.Reservations_Field_Owner, error) {
+	qryGetAllReservations := `CALL GetReservationsPerOwnerByMonthAndHour(?,?,?);`
+	rows, err := r.db.QueryContext(ctx, qryGetAllReservations, id, month, hour)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []models.Reservations_Field_Owner
+
+	for rows.Next() {
+		var reservation models.Reservations_Field_Owner
+		var date string // Usaremos una variable temporal para almacenar la fecha de la base de datos.
+
+		err := rows.Scan(&reservation.User_Name, &reservation.Field_Name, &date,
+			&reservation.Start_Time, &reservation.End_Time, &reservation.Type, &reservation.Phone, &reservation.Status)
+		if err != nil {
+			return nil, err
+		}
+
+		// Formateamos la fecha a "YYYY-MM-DD".
+		reservation.Date = date[:10]
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
+}
+
+func (r *reservationRepository) GetAllReservationsPerOwner(ctx context.Context, id int) ([]models.Reservations_Field_Owner, error) {
 	qryGetAllReservationsPerFieldOwner := `CALL GetReservationsByOwner(?);`
 	rows, err := r.db.QueryContext(ctx, qryGetAllReservationsPerFieldOwner, id)
 	if err != nil {
