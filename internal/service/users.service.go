@@ -77,7 +77,7 @@ func (s *serv) GetUserByEmail(ctx context.Context, email string) (*entity.User, 
 	return s.repo.GetUserByEmail(ctx, email)
 }
 
-func (s *serv) GetUserEmailByID(ctx context.Context, id int) entity.UserEmailByID {
+func (s *serv) GetUserEmailByID(ctx context.Context, id int) *entity.UserEmailByID {
 	return s.repo.GetUserEmailByID(ctx, id)
 }
 

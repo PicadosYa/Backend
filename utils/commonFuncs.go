@@ -162,6 +162,7 @@ func SendEmail(templateID, email, firstparameter, secondparameter string) error 
 	message.SetTemplateID(templateID)
 	client := sendgrid.NewSendClient(APIKEY)
 	response, err := client.Send(message)
+	fmt.Printf("estoy enviando a este %s, first %s, second %s", email, firstparameter, secondparameter)
 	if err != nil {
 		return err
 	}

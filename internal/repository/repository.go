@@ -24,7 +24,7 @@ type Repository interface {
 	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 	CreateOrRemoveFavourite(ctx context.Context, id_user, id_field int) error
 	GetFavouritesPerUser(ctx context.Context, id int) ([]dtos.FavsResults, error)
-	GetUserEmailByID(ctx context.Context, id int) entity.UserEmailByID
+	GetUserEmailByID(ctx context.Context, id int) *entity.UserEmailByID
 }
 
 type repo struct {

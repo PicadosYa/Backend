@@ -101,7 +101,7 @@ func (a *API) CreateReservation(c echo.Context) error {
 	if err := a.reservationService.CreateReservation(ctx, &reservationToRegister); err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: "Internal server error", Error: err.Error()})
 	}
-	utils.SendEmail("d-1dc0f0686db042f08a10d5caa4b80612", userEmail.Email, canchaName.Field_Address, reservation.StartTime)
+	utils.SendEmail("d-1dc0f0686db042f08a10d5caa4b80612", userEmail.Email, canchaName.Field_Name, reservation.StartTime)
 	return c.JSON(http.StatusCreated, reservation)
 }
 
