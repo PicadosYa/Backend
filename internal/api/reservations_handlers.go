@@ -71,7 +71,6 @@ func (a *API) GetReservation(c echo.Context) error {
 // @Router /reservations [post]
 func (a *API) CreateReservation(c echo.Context) error {
 	ctx := c.Request().Context()
-
 	reservation := new(models.Reservation_without_id)
 	if err := c.Bind(reservation); err != nil {
 		return c.JSON(http.StatusBadRequest, models.ResponseMessage{Message: err.Error()})
@@ -81,6 +80,8 @@ func (a *API) CreateReservation(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: err.Error()})
 	}
+	userEmail := a.serv.GetUserEmailByID(ctx, id_user)
+	canchaName := a.fieldService.GetFieldIndividually(ctx, reservation.FieldID)
 	layout := "2006-01-02"
 	parsedDate, err := time.Parse(layout, reservation.Date)
 	if err != nil {
@@ -100,6 +101,7 @@ func (a *API) CreateReservation(c echo.Context) error {
 	if err := a.reservationService.CreateReservation(ctx, &reservationToRegister); err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: "Internal server error", Error: err.Error()})
 	}
+	utils.SendEmail("d-1dc0f0686db042f08a10d5caa4b80612", userEmail.Email, canchaName.Field_Name, reservation.StartTime)
 	return c.JSON(http.StatusCreated, reservation)
 }
 

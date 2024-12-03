@@ -148,15 +148,15 @@ func GenerateRandomDigits(n int) string {
 }
 
 // Sendgrid
-func SendEmail(templateID, email, token, name string) error {
+func SendEmail(templateID, email, firstparameter, secondparameter string) error {
 	message := mail.NewV3Mail()
 	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
 	message.SetFrom(from)
 	personalization := mail.NewPersonalization()
 	to := mail.NewEmail("picadosya", email)
 	personalization.AddTos(to)
-	personalization.SetDynamicTemplateData("name", name)
-	personalization.SetDynamicTemplateData("token", token)
+	personalization.SetDynamicTemplateData("firstparameter", firstparameter)
+	personalization.SetDynamicTemplateData("secondparameter", secondparameter)
 	personalization.SetDynamicTemplateData("email", email)
 	message.AddPersonalizations(personalization)
 	message.SetTemplateID(templateID)

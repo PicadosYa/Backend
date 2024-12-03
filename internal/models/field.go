@@ -78,3 +78,8 @@ type FieldsResultsPerOwner struct {
 	Field_Phone   string `json:"field_phone"`
 	Field_Status  bool   `json:"field_status"`
 }
+
+type FieldsReduced struct {
+	Field_Name    string `json:"field_name"`
+	Field_Address string `json:"field_address"`
+}

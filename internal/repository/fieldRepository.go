@@ -18,6 +18,7 @@ type IFieldRepository interface {
 	SaveField(ctx context.Context, field *models.Field) error
 	GetField(ctx context.Context, id int, month time.Time) (*models.Field, error)
 	GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error)
+	GetFieldIndividually(ctx context.Context, id int) models.FieldsReduced
 	UpdateField(ctx context.Context, field *models.Field) error
 	PatchField(ctx context.Context, field *models.Field) error
 	RemoveField(ctx context.Context, id int) error
@@ -168,6 +169,16 @@ func (r *fieldRepository) GetField(ctx context.Context, id int, month time.Time)
 	}
 
 	return &field, nil
+}
+
+func (r *fieldRepository) GetFieldIndividually(ctx context.Context, id int) models.FieldsReduced {
+	u := models.FieldsReduced{}
+	qry := `select name as field_name, address as field_address from fields where id = ?;`
+	err := r.db.GetContext(ctx, u, qry, id)
+	if err != nil {
+		return u
+	}
+	return u
 }
 
 func (r *fieldRepository) GetFields(ctx context.Context, month time.Time, limit int, offset int) ([]models.Field, error) {
