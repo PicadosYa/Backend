@@ -9,6 +9,7 @@ import (
 
 type Field struct {
 	Id              int                  `json:"id" db:"id" form:"id"`
+	UserID          int                  `json:"user_id" db:"user_id" form:"user_id"`
 	Name            string               `json:"name" db:"name" form:"name"`
 	Address         string               `json:"address" db:"address" form:"address"`
 	Neighborhood    string               `json:"neighborhood" db:"neighborhood" form:"neighborhood"`

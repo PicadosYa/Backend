@@ -48,6 +48,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-openapi/strfmt v0.23.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-playground/form/v4 v4.2.1
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
