@@ -9,10 +9,10 @@ import (
 	"io"
 )
 
-const key = "77436389533582340839681488237694"
+const Key = "77436389533582340839681488237694"
 
 func Encrypt(plaintext []byte) ([]byte, error) {
-	c, err := aes.NewCipher([]byte(key))
+	c, err := aes.NewCipher([]byte(Key))
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func Encrypt(plaintext []byte) ([]byte, error) {
 }
 
 func Decrypt(ciphertext []byte) ([]byte, error) {
-	c, err := aes.NewCipher([]byte(key))
+	c, err := aes.NewCipher([]byte(Key))
 	if err != nil {
 		return nil, err
 	}

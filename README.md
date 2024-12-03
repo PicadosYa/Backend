@@ -224,49 +224,91 @@ Trae toda la info de una sola cancha. EJ:
 -`/fields/:id?month=2024-10`: Al igual que la anterior traera las reservas y fechas no disponibles posteriores a lo especificado. </br></br>
 Por defecto es siempre el mes actual
 
-## `POST /fields`
-Sirve para insertar una nueva cancha: </br></br>
-<b>Ejemplo de Request Body: </b>
+## Create Field API Endpoint
 
-```JSON
-{
-  "name": "Name",
-  "address": "Adress",
-  "neighborhood": "neighborhood",
-  "phone": "097 777 777",
-  "latitude": 0,
-  "longitude": 0,
-  "type": "5",
-  "price": 1500,
-  "description": "description",
-  "logo_url": "https://exmaple.com/name.jpg",
-  "services": [
-    {
-      "id": 1
-    },
-    {
-      "id": 1
-    }
-  ],
-  "creation_date": "2024-10-23",
-  "photos": [
-    "https://example.com/uy/wp-content/uploads/sites/2/2013/05/name-1.jpg",
-    "https://example.com/uy/wp-content/uploads/sites/2/2013/05/name-2.jpg",
-    "https://example.com/uy/wp-content/uploads/sites/2/2013/05/name-3.jpg"
-  ],
-  "available_days": [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7"
-  ]
-}
+### Endpoint
+`POST /api/fields`
+
+### Authentication
+- Requires Bearer Token in Authorization Header
+- Requires users with `field` role
+
+### Request Parameters
+
+#### Form Data Fields
+
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| `name` | string | Yes | Field name | `"TestFieldName"` |
+| `user_id` | integer | Yes | User ID | `1` |
+| `address` | string | No | address | `Calle 123` |
+| `neighborhood` | string | No | neighborhood | `Barrio Peñarol💛​🖤​` |
+| `phone` | string | No | phone | `097 777 777` |
+| `latitude` | float64 | No | latitude | `-34.901112` |
+| `longitude` | string | No | longitude | `-56.164532` |
+| `type` | string | No | type of field | `5  \ 7 \ 11` |
+| `price` | float64 | No | price per hour | `1200` |
+| `description` | string | No | description | `A beautiful description` |
+| `services[0].id` | integer | Optional | Service IDs | `1` |
+| `available_days` | string[] | Optional | Available days | `"1"`, `"2"` |
+| `creation_date` | string (YYYY-MM-DD) | Optional | Creation date | `"2024-12-02"` |
+| `fieldImages` | file[] | Optional | Field images | Multiple image files |
+| `unvailable_dates[0].fromDate` | string (YYYY-MM-DD) | Optional | Unavailable from date | `"2024-12-15"` |
+| `unvailable_dates[0].toDate` | string (YYYY-MM-DD) | Optional | Unavailable to date | `"2024-12-20"` |
+
+### CURL Example
+
+```bash
+curl -X POST \
+  'http://localhost:8080/api/fields' \
+  --header 'Authorization: Bearer YOUR_TOKEN_HERE' \
+  --form 'name="Sports Complex"' \
+  --form 'user_id=1' \
+  --form 'services[0].id=1' \
+  --form 'services[1].id=2' \
+  --form 'available_days="1"' \
+  --form 'available_days="2"' \
+  --form 'creation_date="2024-12-02"' \
+  --form 'unvailable_dates[0].fromDate="2024-12-15"' \
+  --form 'unvailable_dates[0].toDate="2024-12-20"' \
+  --form 'unvailable_dates[1].fromDate="2025-01-10"' \
+  --form 'unvailable_dates[1].toDate="2025-01-15"' \
+  --form 'fieldImages=@/path/to/image1.png' \
+  --form 'fieldImages=@/path/to/image2.jpg'
+```
+### JavaScript (Fetch) Example
+
+```js
+const formData = new FormData();
+formData.append('name', 'Sports Complex');
+formData.append('user_id', 1);
+formData.append('services[0].id', 1);
+formData.append('services[1].id', 2);
+formData.append('available_days', '1');
+formData.append('available_days', '2');
+formData.append('creation_date', '2024-12-02');
+formData.append('unvailable_dates[0].fromDate', '2024-12-15');
+formData.append('unvailable_dates[0].toDate', '2024-12-20');
+formData.append('unvailable_dates[1].fromDate', '2025-01-10');
+formData.append('unvailable_dates[1].toDate', '2025-01-15');
+formData.append('fieldImages', imageFile1);
+formData.append('fieldImages', imageFile2);
+
+
+fetch('http://localhost:8080/api/fields', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_TOKEN_HERE'
+  },
+  body: formData
+});
 ```
 
-`Response: 201`
+#### Notes
+
+- Multiple services can be added by incrementing index (`services[0].id, services[1].id`)
+- Multiple unavailable dates can be added similarly
+- Images can be added by repeating fieldImages parameter
 
 ## `GET /api/fields/per-owner`
 Mandar token por authorization

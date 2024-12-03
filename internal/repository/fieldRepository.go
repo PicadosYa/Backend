@@ -36,7 +36,7 @@ func NewFieldRepository(db *sqlx.DB) IFieldRepository {
 }
 
 func (r *fieldRepository) SaveField(ctx context.Context, field *models.Field) error {
-	query := `CALL InsertField(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	query := `CALL InsertField(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	photoURLsStr := strings.Join(field.Photos, ",")
 	availableDaysStr := strings.Join(field.AvailableDays, ",")
 	serviceIDsStr := utils.SliceToString(field.Services)
@@ -58,6 +58,7 @@ func (r *fieldRepository) SaveField(ctx context.Context, field *models.Field) er
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
+		field.UserID,
 		field.Name,
 		field.Address,
 		field.Neighborhood,

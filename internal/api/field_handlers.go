@@ -1,13 +1,14 @@
 package api
 
 import (
-	"log"
 	"net/http"
 	"picadosYa/internal/models"
 	"picadosYa/utils"
 	"strconv"
 	"time"
 
+	"github.com/go-openapi/strfmt"
+	"github.com/go-playground/form/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -85,29 +86,44 @@ func (a *API) GetField(c echo.Context) error {
 
 func (a *API) CreateField(c echo.Context) error {
 	ctx := c.Request().Context()
-	formFiles, err := c.MultipartForm()
+
+	multiPartForm, err := c.MultipartForm()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ResponseError{Message: "Invalid request", Error: err.Error()})
-	}
-	files := formFiles.File
-	if len(files) == 0 {
-		return c.JSON(http.StatusBadRequest, models.ResponseError{Message: "Invalid request", Error: "No files provided"})
+		return c.JSON(http.StatusBadRequest, models.ResponseError{
+			Message: "Invalid file upload",
+			Error:   err.Error(),
+		})
 	}
 
-	field := new(models.Field)
-	if err := c.Bind(field); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ResponseError{Message: "Invalid request", Error: err.Error()})
+	field := &models.Field{}
+
+	// Bindear automáticamente
+	decoder := form.NewDecoder()
+	decoder.RegisterCustomTypeFunc(func(values []string) (interface{}, error) {
+		if len(values) == 0 {
+			return nil, nil
+		}
+		date, _ := time.Parse("2006-01-02", values[0])
+		return strfmt.Date(date), nil
+	}, strfmt.Date{})
+
+	err = decoder.Decode(&field, multiPartForm.Value)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.ResponseError{
+			Message: "Invalid form data",
+			Error:   err.Error(),
+		})
 	}
-	log.Println("Bind data successful")
-	if err := a.dataValidator.Struct(field); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ResponseError{Message: "Invalid request", Error: err.Error()})
+
+	// Save the field
+	if err := a.fieldService.SaveField(ctx, field, &multiPartForm.File); err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseError{
+			Message: "Failed to save field",
+			Error:   err.Error(),
+		})
 	}
-	log.Println("Validation successful")
-	if err := a.fieldService.SaveField(ctx, field, &files); err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: "Internal server error", Error: err.Error()})
-	}
-	log.Println("Save field successful")
-	return c.NoContent(http.StatusCreated)
+
+	return c.JSON(http.StatusCreated, field)
 }
 
 func (a *API) GetFieldsPerOwner(c echo.Context) error {
