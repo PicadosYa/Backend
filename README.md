@@ -598,6 +598,11 @@ aunque le pagues
 
 
 ## `GET /reservations/reservations-per-owner?MonthsAgo=1&Hour=14&format=csv`
+/reservations/reservations-per-owner?MonthsAgo=1&format=csv
+/reservations/reservations-per-owner?Hour=14&format=csv
+/reservations/reservations-per-owner?format=csv
+/reservations/reservations-per-owner
+La idea es que la url vaya cambiando, le sacas y le pones los params
 Explicación: cuando se quiera filtrar por MonthsAgo se le envía a partir del 1 en adelante, esto hace que filtre si le mando un 3, de los últimos 3 meses, si le mando Hour filtrará a partir de la hora 14 por ejemplo, eso me va a traer todas las reservas hechas a las 14. 
 Si no hay ningún filtro que aplicar, se usará solo la ruta /reservations/reservations-per-owner, los filtros se añaden con forme se le añaden queryParams.
 Ahora es importante que cuando se haga la consulta en la tabla sea haga un get sin el Params format, ya que este está hecho para descargar ya sea csv o pdf en minúscula.
