@@ -37,10 +37,11 @@ func (s *reservationService) SaveReservation(ctx context.Context, reservation *m
 }
 
 func (s *reservationService) GetAllReservationsExport(ctx context.Context, id, month, hour int) ([]models.Reservations_Field_Owner, error) {
-	if month == 123 {
+	if hour == 123 && month == 123 {
+		return s.repo.GetAllReservationsPerOwner(ctx, id)
+	} else if month == 123 {
 		return s.repo.GetAllReservationsPerHour(ctx, id, hour)
-	}
-	if hour == 123 {
+	} else if hour == 123 {
 		return s.repo.GetAllReservationsPerMonth(ctx, id, month)
 	}
 	return s.repo.GetAllReservationsExport(ctx, id, month, hour)

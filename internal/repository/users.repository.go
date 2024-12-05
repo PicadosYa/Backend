@@ -65,6 +65,15 @@ func (r *repo) GetUserByEmail(ctx context.Context, email string) (*entity.User, 
 	}
 	return u, nil
 }
+func (r *repo) GetUserEmailByID(ctx context.Context, id int) *entity.UserEmailByID {
+	qry := `select email from users where id = ?;`
+	u := &entity.UserEmailByID{}
+	err := r.db.GetContext(ctx, u, qry, id)
+	if err != nil {
+		return u
+	}
+	return u
+}
 
 func (r *repo) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
 	u := &entity.User{}

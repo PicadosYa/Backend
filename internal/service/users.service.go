@@ -77,6 +77,10 @@ func (s *serv) GetUserByEmail(ctx context.Context, email string) (*entity.User, 
 	return s.repo.GetUserByEmail(ctx, email)
 }
 
+func (s *serv) GetUserEmailByID(ctx context.Context, id int) *entity.UserEmailByID {
+	return s.repo.GetUserEmailByID(ctx, id)
+}
+
 func (s *serv) SaveToken(ctx context.Context, email, token string, expiration time.Time) error {
 	err := s.repo.SaveToken(ctx, email, token, expiration)
 	if err != nil {
@@ -93,7 +97,7 @@ func (s *serv) SendRecoveryEmail(email, token string) error {
 		return nil
 	}
 	templateID := "d-14d7497e32d745889c502d5bb3d7bdca"
-	return utils.SendEmail(templateID, email, token, u.FirstName)
+	return utils.SendEmail(templateID, email, u.FirstName, token)
 }
 
 func (s *serv) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
@@ -145,7 +149,7 @@ func (s *serv) SendVerifyEmail(email, token string) error {
 		return nil
 	}
 	templateID := "d-b512ab2466914e5fb4315a7e0998506c"
-	return utils.SendEmail(templateID, email, token, u.FirstName)
+	return utils.SendEmail(templateID, email, u.FirstName, token)
 }
 
 func (s *serv) GetUserByToken(ctx context.Context, token string) (*dtos.VerifyUserEmail, error) {

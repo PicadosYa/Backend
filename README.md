@@ -596,37 +596,12 @@ aunque le pagues
 `Response: 201`
 
 
-## `GET /reservations/reservations-per-owner`
-Obtiene todas las reservations por owner
-```JSON
-[
-    {
-        "user_name": "dea 123",
-        "field_name": "Sample Field Name",
-        "date": "2024-12-01T00:00:00Z",
-        "start_time": "10:00:00",
-        "end_time": "12:00:00",
-        "type": "5",
-        "phone": "123-456-7890",
-        "status": "reserved"
-    },
-    {
-        "user_name": "dea 123",
-        "field_name": "Sample Field Name",
-        "date": "2024-12-02T00:00:00Z",
-        "start_time": "14:00:00",
-        "end_time": "16:00:00",
-        "type": "5",
-        "phone": "123-456-7890",
-        "status": "reserved"
-    }
-]
-```
-`Response: 200`
 
-## `GET /reservations/reservations-per-owner/export?MonthsAgo=1&Hour=14&format=csv`
-Explicación: cuando se quiera filtrar por MonthsAgo se le envía a partir del 0 en adelante, esto hace que filtre si le mando un 3, de los últimos 3 meses, si le mando Hour filtrará a partir de la hora 14 por ejemplo, eso me va a traer todas las reservas hechas a las 14. 
+## `GET /reservations/reservations-per-owner?MonthsAgo=1&Hour=14&format=csv`
+Explicación: cuando se quiera filtrar por MonthsAgo se le envía a partir del 1 en adelante, esto hace que filtre si le mando un 3, de los últimos 3 meses, si le mando Hour filtrará a partir de la hora 14 por ejemplo, eso me va a traer todas las reservas hechas a las 14. 
+Si no hay ningún filtro que aplicar, se usará solo la ruta /reservations/reservations-per-owner, los filtros se añaden con forme se le añaden queryParams.
 Ahora es importante que cuando se haga la consulta en la tabla sea haga un get sin el Params format, ya que este está hecho para descargar ya sea csv o pdf en minúscula.
+`Response: 200`
 
 
 ## `GET /reservations/reservations-per-user`

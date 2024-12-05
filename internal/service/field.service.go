@@ -20,6 +20,7 @@ type FieldService interface {
 	PatchField(ctx context.Context, field *models.Field) error
 	RemoveField(ctx context.Context, id int) error
 	GetFieldsPerOwner(ctx context.Context, id_user int) ([]models.FieldsResultsPerOwner, error)
+	GetFieldIndividually(ctx context.Context, id int) *models.FieldsReduced
 }
 
 type fieldService struct {
@@ -89,4 +90,8 @@ func (s *fieldService) PatchField(ctx context.Context, field *models.Field) erro
 
 func (s *fieldService) RemoveField(ctx context.Context, id int) error {
 	return s.repo.RemoveField(ctx, id)
+}
+
+func (s *fieldService) GetFieldIndividually(ctx context.Context, id int) *models.FieldsReduced {
+	return s.repo.GetFieldIndividually(ctx, id)
 }

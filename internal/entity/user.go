@@ -14,3 +14,7 @@ type User struct {
 	IsVerified        bool     `db:"isVerified"`
 	AcceptedTerms     bool     `db:"accepted_terms"`
 }
+
+type UserEmailByID struct {
+	Email string `json:"user_email"`
+}

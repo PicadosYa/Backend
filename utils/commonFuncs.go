@@ -148,20 +148,21 @@ func GenerateRandomDigits(n int) string {
 }
 
 // Sendgrid
-func SendEmail(templateID, email, token, name string) error {
+func SendEmail(templateID, email, firstparameter, secondparameter string) error {
 	message := mail.NewV3Mail()
 	from := mail.NewEmail("picadosya", "picadosya@gmail.com")
 	message.SetFrom(from)
 	personalization := mail.NewPersonalization()
 	to := mail.NewEmail("picadosya", email)
 	personalization.AddTos(to)
-	personalization.SetDynamicTemplateData("name", name)
-	personalization.SetDynamicTemplateData("token", token)
+	personalization.SetDynamicTemplateData("firstparameter", firstparameter)
+	personalization.SetDynamicTemplateData("secondparameter", secondparameter)
 	personalization.SetDynamicTemplateData("email", email)
 	message.AddPersonalizations(personalization)
 	message.SetTemplateID(templateID)
 	client := sendgrid.NewSendClient(APIKEY)
 	response, err := client.Send(message)
+	fmt.Printf("estoy enviando a este %s, first %s, second %s", email, firstparameter, secondparameter)
 	if err != nil {
 		return err
 	}
@@ -213,11 +214,15 @@ func GeneratePDF(c echo.Context, reservations []models.Reservations_Field_Owner)
 	pdf.SetFont("Arial", "B", 12)
 
 	// Título
-	pdf.CellFormat(0, 10, "Reservations Export", "", 1, "C", false, 0, "")
+	pdf.CellFormat(0, 10, "Last reservations", "", 1, "C", false, 0, "")
 
 	// Encabezados
 	headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
 	columnWidths := []float64{40, 40, 30, 25, 25, 30, 40, 25} // Ajustar anchos para que se vean todas las columnas
+
+	// Configurar colores para las cabeceras
+	pdf.SetFillColor(220, 220, 220) // Color de fondo (gris claro)
+	pdf.SetTextColor(0, 0, 0)       // Color del texto (negro)
 
 	for i, header := range headers {
 		pdf.CellFormat(columnWidths[i], 10, header, "1", 0, "C", true, 0, "")
@@ -226,6 +231,7 @@ func GeneratePDF(c echo.Context, reservations []models.Reservations_Field_Owner)
 
 	// Datos
 	pdf.SetFont("Arial", "", 10)
+	pdf.SetFillColor(255, 255, 255) // Fondo blanco para las celdas de datos
 	for _, reservation := range reservations {
 		row := []string{
 			reservation.User_Name,
