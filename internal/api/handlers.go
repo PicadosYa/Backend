@@ -337,3 +337,38 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 		"token": token,
 	})
 }
+
+func (a *API) RefreshToken(c echo.Context) error {
+    ctx := c.Request().Context()
+    
+    // Obtener el ID del usuario desde el token
+    idUser := utils.GenerateUserID(c)
+
+    // Obtener la información completa del usuario
+    user, err := a.serv.GetUserByID(ctx, idUser)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error retrieving user"})
+    }
+
+    // Generar un nuevo token
+    token, err := encryption.SignedLoginToken(&models.User{
+        ID:                user.ID,
+        FirstName:         user.FirstName,
+        LastName:          user.LastName,
+        Email:             user.Email,
+        Phone:             user.Phone,
+        ProfilePictureUrl: user.ProfilePictureUrl,
+        Role:              user.Role,
+        PositionPlayer:    user.PositionPlayer,
+        Age:               user.Age,
+        IsVerified:        user.IsVerified,
+    })
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error generating token"})
+    }
+
+    // Devolver el nuevo token
+    return c.JSON(http.StatusOK, map[string]string{
+        "token": token,
+    })
+}

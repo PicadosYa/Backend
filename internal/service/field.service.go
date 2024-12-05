@@ -36,7 +36,6 @@ func NewFieldService(repo repository.IFieldRepository, fileRepo repository.IFile
 
 func (s *fieldService) SaveField(ctx context.Context, field *models.Field, files *map[string][]*multipart.FileHeader) error {
 	log.Println("Saving field")
-	log.Printf("Files: %v", files)
 	for key, fileHeaders := range *files {
 		if key == "fieldImages" {
 			log.Println(key)
