@@ -63,6 +63,11 @@ func (a *API) LoginUser(c echo.Context) error {
 	}
 	u, err := a.serv.LoginUser(ctx, params.Email, params.Password)
 	if err != nil {
+		if err == service.ErrUserDoesNotExist {
+			return c.JSON(http.StatusNotFound, models.ResponseMessage{Message: "user does not exist"})
+		} else if err == service.ErrInvalidCredentials {
+			return c.JSON(http.StatusUnauthorized, models.ResponseMessage{Message: "invalid credentials"})
+		}
 		return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: err.Error()})
 	}
 	userCreated := dtos.LoguedUser{
@@ -339,36 +344,36 @@ func (a *API) UpdateUserProfileInfo(c echo.Context) error {
 }
 
 func (a *API) RefreshToken(c echo.Context) error {
-    ctx := c.Request().Context()
-    
-    // Obtener el ID del usuario desde el token
-    idUser := utils.GenerateUserID(c)
+	ctx := c.Request().Context()
 
-    // Obtener la información completa del usuario
-    user, err := a.serv.GetUserByID(ctx, idUser)
-    if err != nil {
-        return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error retrieving user"})
-    }
+	// Obtener el ID del usuario desde el token
+	idUser := utils.GenerateUserID(c)
 
-    // Generar un nuevo token
-    token, err := encryption.SignedLoginToken(&models.User{
-        ID:                user.ID,
-        FirstName:         user.FirstName,
-        LastName:          user.LastName,
-        Email:             user.Email,
-        Phone:             user.Phone,
-        ProfilePictureUrl: user.ProfilePictureUrl,
-        Role:              user.Role,
-        PositionPlayer:    user.PositionPlayer,
-        Age:               user.Age,
-        IsVerified:        user.IsVerified,
-    })
-    if err != nil {
-        return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error generating token"})
-    }
+	// Obtener la información completa del usuario
+	user, err := a.serv.GetUserByID(ctx, idUser)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error retrieving user"})
+	}
 
-    // Devolver el nuevo token
-    return c.JSON(http.StatusOK, map[string]string{
-        "token": token,
-    })
+	// Generar un nuevo token
+	token, err := encryption.SignedLoginToken(&models.User{
+		ID:                user.ID,
+		FirstName:         user.FirstName,
+		LastName:          user.LastName,
+		Email:             user.Email,
+		Phone:             user.Phone,
+		ProfilePictureUrl: user.ProfilePictureUrl,
+		Role:              user.Role,
+		PositionPlayer:    user.PositionPlayer,
+		Age:               user.Age,
+		IsVerified:        user.IsVerified,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseMessage{Message: "Error generating token"})
+	}
+
+	// Devolver el nuevo token
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": token,
+	})
 }

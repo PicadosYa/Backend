@@ -18,6 +18,7 @@ import (
 
 var (
 	ErrUserAlreadyExists     = errors.New("user already exists")
+	ErrUserDoesNotExist      = errors.New("user does not exist")
 	ErrInvalidCredentials    = errors.New("invalid credentials")
 	ErrTokenInvalidOrExpired = errors.New("invalid or expired token")
 )
@@ -42,7 +43,7 @@ func (s *serv) RegisterUser(ctx context.Context, first_name, last_name, email, p
 func (s *serv) LoginUser(ctx context.Context, email, password string) (*models.User, error) {
 	u, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, ErrUserDoesNotExist
 	}
 	bb, err := encryption.FromBase64(u.Password)
 	if err != nil {

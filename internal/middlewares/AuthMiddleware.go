@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"picadosYa/internal/service"
 	"strings"
 	"time"
 
@@ -12,10 +13,11 @@ import (
 type CustomClaims struct {
 	ID   int    `json:"id"`
 	Role string `json:"role"`
+	Exp  int64  `json:"exp"`
 	jwt.StandardClaims
 }
 
-func JWTMiddleware(secretKey []byte) echo.MiddlewareFunc {
+func JWTMiddleware(secretKey []byte, userService service.Service) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Extract token from Authorization header
@@ -49,12 +51,19 @@ func JWTMiddleware(secretKey []byte) echo.MiddlewareFunc {
 			}
 
 			// Check token expiration
-			if claims.ExpiresAt < time.Now().Unix() {
+			if claims.Exp < time.Now().Unix() {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
 					"error": "Token expired",
 				})
 			}
 
+			// Check if user exists in database
+			_, err = userService.GetUserByID(c.Request().Context(), claims.ID)
+			if err != nil {
+				return c.JSON(http.StatusNotFound, map[string]string{
+					"error": "User not found",
+				})
+			}
 			// Store claims in context for route handlers
 			c.Set("user", claims)
 

@@ -2,7 +2,7 @@ package api
 
 import (
 	"picadosYa/encryption"
-//	"picadosYa/internal/entity"
+	//	"picadosYa/internal/entity"
 	"picadosYa/internal/middlewares"
 
 	"github.com/labstack/echo/v4"
@@ -22,11 +22,11 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	users.PUT("/reset-password", a.ResetPassword)
 	users.GET("/verify", a.UpdateVerifyUser)
 	users.POST("/verify-user-email", a.VerifyUserEmail) //envía el correo
-	users.PUT("/update-user-profile", a.UpdateUserProfileInfo)
+	users.PUT("/update-user-profile", a.UpdateUserProfileInfo, middlewares.JWTMiddleware([]byte(encryption.Key), a.serv))
 	users.GET("/check-info", a.GetUserByID)
 	users.POST("/add-favourites", a.CreateOrRemoveFavourite)
 	users.GET("/favourites-per-user", a.GetFavouritesPerUser)
-  users.GET("/refresh-token", a.RefreshToken ,middlewares.JWTMiddleware([]byte(encryption.Key)))
+	users.GET("/refresh-token", a.RefreshToken, middlewares.JWTMiddleware([]byte(encryption.Key), a.serv))
 
 	// ###################
 	// Fields Endpoints
@@ -34,7 +34,7 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	fields := apiGroup.Group("/fields")
 	fields.GET("", a.GetFields)
 	fields.GET("/:id", a.GetField)
-	fields.POST("", a.CreateField, middlewares.JWTMiddleware([]byte(encryption.Key)))
+	fields.POST("", a.CreateField, middlewares.JWTMiddleware([]byte(encryption.Key), a.serv))
 	fields.PUT("/:id", a.UpdateField)
 	fields.PATCH("/:id", a.PatchField)
 	fields.DELETE("/:id", a.RemoveField)
