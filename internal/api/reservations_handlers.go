@@ -76,7 +76,7 @@ func (a *API) CreateReservation(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, models.ResponseMessage{Message: err.Error()})
 	}
 
-	id_user, role_user, err := utils.GetUserIdAndRole(c)
+	id_user, _, err := utils.GetUserIdAndRole(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: err.Error()})
 	}
@@ -95,9 +95,9 @@ func (a *API) CreateReservation(c echo.Context) error {
 		EndTime:   reservation.EndTime,
 		PaymentID: reservation.PaymentID,
 	}
-	if role_user != "client" {
-		return c.JSON(http.StatusUnauthorized, models.ResponseError{Message: "No estás logueado como usuario"})
-	}
+	// if role_user != "client" {
+	// 	return c.JSON(http.StatusUnauthorized, models.ResponseError{Message: "No estás logueado como usuario"})
+	// }
 	if err := a.reservationService.CreateReservation(ctx, &reservationToRegister); err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseError{Message: "Internal server error", Error: err.Error()})
 	}

@@ -56,4 +56,6 @@ func (a *API) RegisterRoutes(e *echo.Echo) {
 	// Payment Endpoints
 	// ###################
 	apiGroup.POST("/create_preference", a.PaymentPrincipal)
+	apiGroup.POST("/create-paypal-order", a.createPayPalOrder, middlewares.JWTMiddleware([]byte(encryption.Key), a.serv))
+	apiGroup.GET("/capture-paypal-order/:orderID", a.capturePayPalOrder, middlewares.JWTMiddleware([]byte(encryption.Key), a.serv))
 }

@@ -214,7 +214,7 @@ func GeneratePDF(c echo.Context, reservations []models.Reservations_Field_Owner)
 	pdf.SetFont("Arial", "B", 12)
 
 	// Título
-	pdf.CellFormat(0, 10, "Last reservations", "", 1, "C", false, 0, "")
+	pdf.CellFormat(0, 10, "Reservas", "", 1, "C", false, 0, "")
 
 	// Encabezados
 	headers := []string{"UserName", "FieldName", "Date", "StartTime", "EndTime", "Type", "Phone", "Status"}
@@ -234,13 +234,13 @@ func GeneratePDF(c echo.Context, reservations []models.Reservations_Field_Owner)
 	pdf.SetFillColor(255, 255, 255) // Fondo blanco para las celdas de datos
 	for _, reservation := range reservations {
 		row := []string{
-			reservation.User_Name,
-			reservation.Field_Name,
+			reservation.User.FirstName + " " + reservation.User.LastName,
+			reservation.Field.Name,
 			reservation.Date,
 			reservation.Start_Time,
 			reservation.End_Time,
-			reservation.Type,
-			reservation.Phone,
+			reservation.Field.Type,
+			reservation.Field.Phone,
 			reservation.Status,
 		}
 
@@ -271,13 +271,13 @@ func GenerateCSV(c echo.Context, reservations []models.Reservations_Field_Owner)
 	// Filas
 	for _, reservation := range reservations {
 		writer.Write([]string{
-			reservation.User_Name,
-			reservation.Field_Name,
+			reservation.User.FirstName + " " + reservation.User.LastName,
+			reservation.Field.Name,
 			reservation.Date,
 			reservation.Start_Time,
 			reservation.End_Time,
-			reservation.Type,
-			reservation.Phone,
+			reservation.Field.Type,
+			reservation.Field.Phone,
 			reservation.Status,
 		})
 	}

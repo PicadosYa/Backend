@@ -1,6 +1,8 @@
 module picadosYa
 
-go 1.22.5
+go 1.23
+
+toolchain go1.23.4
 
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.9.0
@@ -10,7 +12,10 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/labstack/echo/v4 v4.12.0
+	github.com/mercadopago/sdk-go v1.0.6
+	github.com/plutov/paypal/v4 v4.11.0
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/echo-swagger v1.4.1
@@ -30,9 +35,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mercadopago/sdk-go v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
@@ -52,7 +55,7 @@ require (
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

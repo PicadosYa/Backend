@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Reservation_without_id struct {
 	FieldID   int    `json:"field_id" db:"field_id"`
@@ -30,12 +32,11 @@ type Reservations_Result struct {
 }
 
 type Reservations_Field_Owner struct {
-	User_Name  string `json:"user_name"`
-	Field_Name string `json:"field_name"`
-	Date       string `json:"date"`
-	Start_Time string `json:"start_time"`
-	End_Time   string `json:"end_time"`
-	Type       string `json:"type"`
-	Phone      string `json:"phone"`
-	Status     string `json:"status"`
+	User       User    `json:"user"`
+	Field      Field   `json:"field"`
+	Date       string  `json:"date"`
+	Start_Time string  `json:"start_time"`
+	End_Time   string  `json:"end_time"`
+	Status     string  `json:"status"`
+	TotalPrice float64 `json:"total_price"`
 }
